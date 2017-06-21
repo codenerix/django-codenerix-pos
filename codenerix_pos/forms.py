@@ -22,21 +22,39 @@ from django.utils.translation import ugettext_lazy as _
 
 from codenerix.forms import GenModelForm
 
-from .models import POS
+from .models import POS, POSSlot
 
 
 class POSForm(GenModelForm):
     class Meta:
         model = POS
-        exclude = []
+        exclude = ['services','payments']
 
     def __groups__(self):
         g = [
             (
                 _('Details'), 12,
-                ['name', 6],
-                ['cid', 6],
-                ['key', 6],
+                ['cid', 4],
+                ['key', 4],
+                ['name', 4],
+            )
+        ]
+        return g
+
+
+class POSSlotForm(GenModelForm):
+    class Meta:
+        model = POSSlot
+        exclude = ['orders']
+
+    def __groups__(self):
+        g = [
+            (
+                _('Details'), 12,
+                ['name', 4],
+                ['pos', 4],
+                ['pos_x', 2],
+                ['pos_y', 2],
             )
         ]
         return g

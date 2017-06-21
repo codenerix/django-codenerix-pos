@@ -20,17 +20,17 @@
 
 from django.utils.translation import ugettext as _
 
-from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUpdateModal, GenDelete, GenDetail, GenDetailModal, GenForeignKey
+from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUpdateModal, GenDelete, GenDetail, GenDetailModal
 
-from .models import POS
-from .forms import POSForm
+from .models import POS, POSSlot
+from .forms import POSForm, POSSlotForm
 
 # POS
-class POSTaxList(GenList):
+class POSList(GenList):
     model = POS
     show_details = True
     extra_context = {
-        'menu': ['TypeTax', 'pos'],
+        'menu': ['pos', 'pos'],
         'bread': [_('POS'), _('POS')]
     }
 
@@ -61,4 +61,43 @@ class POSDetails(GenDetail):
     model = POS
 
 class POSDetailsModal(GenDetailModal, POSDetails):
+    pass
 
+
+# POSSlotSlot
+class POSSlotList(GenList):
+    model = POSSlot
+    show_details = True
+    extra_context = {
+        'menu': ['pos', 'posslot'],
+        'bread': [_('POS'), _('POSSlot')]
+    }
+
+
+class POSSlotCreate(GenCreate):
+    model = POSSlot
+    form_class = POSSlotForm
+
+
+class POSSlotCreateModal(GenCreateModal, POSSlotCreate):
+    pass
+
+
+class POSSlotUpdate(GenUpdate):
+    model = POSSlot
+    form_class = POSSlotForm
+
+
+class POSSlotUpdateModal(GenUpdateModal, POSSlotUpdate):
+    pass
+
+
+class POSSlotDelete(GenDelete):
+    model = POSSlot
+
+
+class POSSlotDetails(GenDetail):
+    model = POSSlot
+
+class POSSlotDetailsModal(GenDetailModal, POSSlotDetails):
+    pass

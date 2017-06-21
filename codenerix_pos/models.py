@@ -23,7 +23,7 @@ from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
 
 from codenerix_payments.models import PaymentRequest
-from codenerix_invoicing.models import SalesOrder
+from codenerix_invoicing.models_sales import SalesOrder
 
 from codenerix.models import CodenerixModel
 
@@ -53,13 +53,13 @@ class POS(CodenerixModel):
         return fields
 
 
-class POSslots(CodenerixModel):
+class POSSlot(CodenerixModel):
     '''
     Slots for Point of Service
     '''
     pos = models.ForeignKey(POS, related_name='slots')
     name = models.CharField(_("Name"), max_length=250, blank=False, null=False, unique=True)
-    orders = models.ManyToManyField(SalesOrder, related_name='posslot')
+    orders = models.ManyToManyField(SalesOrder, related_name='slots')
     pos_x = models.IntegerField(_('Pos X'), null=False, blank=False)
     pos_y = models.IntegerField(_('Pos Y'), null=False, blank=False)
 
@@ -71,9 +71,10 @@ class POSslots(CodenerixModel):
 
     def __fields__(self, info):
         fields = []
+        fields.append(('pos', _("POS")))
         fields.append(('name', _("Name")))
-        fields.append(('services', _("Services")))
-        fields.append(('cid', _("CID")))
-        fields.append(('key', _("Key")))
+        fields.append(('orders', _("Orders")))
+        fields.append(('pos_x', _("X")))
+        fields.append(('pos_y', _("Y")))
         return fields
 
