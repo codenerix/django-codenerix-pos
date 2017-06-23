@@ -45,7 +45,7 @@ class POSForm(GenModelForm):
 class POSSlotForm(GenModelForm):
     class Meta:
         model = POSSlot
-        exclude = ['orders']
+        exclude = ['orders', 'pos_x', 'pos_y']
 
     def __groups__(self):
         g = [
@@ -53,8 +53,6 @@ class POSSlotForm(GenModelForm):
                 _('Details'), 12,
                 ['name', 4],
                 ['pos', 4],
-                ['pos_x', 2],
-                ['pos_y', 2],
             )
         ]
         return g

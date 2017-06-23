@@ -60,8 +60,8 @@ class POSSlot(CodenerixModel):
     pos = models.ForeignKey(POS, related_name='slots')
     name = models.CharField(_("Name"), max_length=250, blank=False, null=False, unique=True)
     orders = models.ManyToManyField(SalesOrder, related_name='slots')
-    pos_x = models.IntegerField(_('Pos X'), null=False, blank=False)
-    pos_y = models.IntegerField(_('Pos Y'), null=False, blank=False)
+    pos_x = models.IntegerField(_('Pos X'), null=True, blank=True, default=None)
+    pos_y = models.IntegerField(_('Pos Y'), null=True, blank=True, default=None)
 
     def __unicode__(self):
         return self.__str__()
@@ -74,7 +74,5 @@ class POSSlot(CodenerixModel):
         fields.append(('pos', _("POS")))
         fields.append(('name', _("Name")))
         fields.append(('orders', _("Orders")))
-        fields.append(('pos_x', _("X")))
-        fields.append(('pos_y', _("Y")))
         return fields
 

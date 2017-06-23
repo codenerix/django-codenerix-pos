@@ -2,7 +2,7 @@
 django-codenerix-pos
 ====================
 
-Codenerix Products is a module that enables `CODENERIX.com <http://www.codenerix.com/>`_ to set Point Of Services on several platforms in a general manner
+Codenerix POS is a module that enables `CODENERIX.com <http://www.codenerix.com/>`_ to set Point Of Services on several platforms in a general manner
 
 .. image:: http://www.centrologic.com/wp-content/uploads/2017/01/logo-codenerix.png
     :target: http://www.codenerix.com
