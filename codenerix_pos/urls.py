@@ -19,10 +19,14 @@
 # limitations under the License.
 
 from django.conf.urls import url
+from django.views.generic import TemplateView
+
 from .views import POSList, POSCreate, POSCreateModal, POSDetails, POSDetailsModal, POSUpdate, POSUpdateModal, POSDelete
 from .views import POSSlotList, POSSlotCreate, POSSlotCreateModal, POSSlotDetails, POSSlotDetailsModal, POSSlotUpdate, POSSlotUpdateModal, POSSlotDelete
 
 urlpatterns = [
+    url(r'^example$', TemplateView.as_view(template_name='codenerix_pos/example.html'), name='CDNX_pos_example'),
+    
     url(r'^poss$', POSList.as_view(), name='CDNX_pos_list'),
     url(r'^poss/add$', POSCreate.as_view(), name='CDNX_pos_add'),
     url(r'^poss/addmodal$', POSCreateModal.as_view(), name='CDNX_pos_addmodal'),
