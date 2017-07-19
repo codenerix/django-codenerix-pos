@@ -18,21 +18,103 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from django.db.models import Q
 from django.utils.translation import ugettext as _
 
 from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUpdateModal, GenDelete, GenDetail, GenDetailModal
 
-from .models import POS, POSSlot
-from .forms import POSForm, POSSlotForm
+from .models import POSZone, POSHardware, POS, POSSlot
+from .forms import POSZoneForm, POSHardwareForm, POSForm, POSSlotForm
 
+
+# ###########################################
+# POSZone
+class POSZoneList(GenList):
+    model = POSZone
+    extra_context = {'menu': ['pos', 'poszone'], 'bread': [_('POS'), _('POSZone'), ]}
+
+
+class POSZoneCreate(GenCreate):
+    model = POSZone
+    form_class = POSZoneForm
+
+
+class POSZoneCreateModal(GenCreateModal, POSZoneCreate):
+    pass
+
+
+class POSZoneUpdate(GenUpdate):
+    model = POSZone
+    form_class = POSZoneForm
+
+
+class POSZoneUpdateModal(GenUpdateModal, POSZoneUpdate):
+    pass
+
+
+class POSZoneDelete(GenDelete):
+    model = POSZone
+
+
+class POSZoneDetails(GenDetail):
+    model = POSZone
+    groups = POSZoneForm.__groups_details__()
+
+
+# ###########################################
+# POSHardware
+class POSHardwareList(GenList):
+    model = POSHardware
+    extra_context = {'menu': ['pos', 'poshardware'], 'bread': [_('POS'), _('POSHardware'), ]}
+
+
+class POSHardwareCreate(GenCreate):
+    model = POSHardware
+    form_class = POSHardwareForm
+
+
+class POSHardwareCreateModal(GenCreateModal, POSHardwareCreate):
+    pass
+
+
+class POSHardwareUpdate(GenUpdate):
+    model = POSHardware
+    form_class = POSHardwareForm
+
+
+class POSHardwareUpdateModal(GenUpdateModal, POSHardwareUpdate):
+    pass
+
+
+class POSHardwareDelete(GenDelete):
+    model = POSHardware
+
+
+class POSHardwareSubList(GenList):
+    model = POSHardware
+    extra_context = {'menu': ['pos', 'poshardware'], 'bread': [_('POS'), _('POSHardware'), ]}
+
+    def __limitQ__(self, info):
+        limit = {}
+        pk = info.kwargs.get('pk', None)
+        limit['link'] = Q(pos__pk=pk)
+        return limit
+
+
+class POSHardwareDetails(GenDetail):
+    model = POSHardware
+    groups = POSHardwareForm.__groups_details__()
+
+
+class POSHardwareDetailModal(GenDetailModal, POSHardwareDetails):
+    pass
+
+
+# ###########################################
 # POS
 class POSList(GenList):
     model = POS
-    show_details = True
-    extra_context = {
-        'menu': ['pos', 'pos'],
-        'bread': [_('POS'), _('POS')]
-    }
+    extra_context = {'menu': ['pos', 'pos'], 'bread': [_('POS'), _('POS'), ]}
 
 
 class POSCreate(GenCreate):
@@ -57,21 +139,31 @@ class POSDelete(GenDelete):
     model = POS
 
 
+class POSSubList(GenList):
+    model = POS
+    extra_context = {'menu': ['pos', 'pos'], 'bread': [_('POS'), _('POS'), ]}
+
+    def __limitQ__(self, info):
+        limit = {}
+        pk = info.kwargs.get('pk', None)
+        limit['link'] = Q(zone__pk=pk)
+        return limit
+
+
 class POSDetails(GenDetail):
     model = POS
+    groups = POSForm.__groups_details__()
 
-class POSDetailsModal(GenDetailModal, POSDetails):
+
+class POSDetailModal(GenDetailModal, POSDetails):
     pass
 
 
-# POSSlotSlot
+# ###########################################
+# POSSlot
 class POSSlotList(GenList):
     model = POSSlot
-    show_details = True
-    extra_context = {
-        'menu': ['pos', 'posslot'],
-        'bread': [_('POS'), _('POSSlot')]
-    }
+    extra_context = {'menu': ['pos', 'posslot'], 'bread': [_('POS'), _('POSSlot'), ]}
 
 
 class POSSlotCreate(GenCreate):
@@ -96,8 +188,21 @@ class POSSlotDelete(GenDelete):
     model = POSSlot
 
 
+class POSSlotSubList(GenList):
+    model = POSSlot
+    extra_context = {'menu': ['pos', 'posslot'], 'bread': [_('POS'), _('POSSlot'), ]}
+
+    def __limitQ__(self, info):
+        limit = {}
+        pk = info.kwargs.get('pk', None)
+        limit['link'] = Q(zone__pk=pk)
+        return limit
+
+
 class POSSlotDetails(GenDetail):
     model = POSSlot
+    groups = POSSlotForm.__groups_details__()
 
-class POSSlotDetailsModal(GenDetailModal, POSSlotDetails):
+
+class POSSlotDetailModal(GenDetailModal, POSSlotDetails):
     pass

@@ -22,38 +22,119 @@ from django.utils.translation import ugettext_lazy as _
 
 from codenerix.forms import GenModelForm
 
-from .models import POS, POSSlot
+from .models import POSZone, POSHardware, POS, POSSlot
+
+
+class POSZoneForm(GenModelForm):
+    class Meta:
+        model = POSZone
+        exclude = []
+
+    def __groups__(self):
+        return [
+            (
+                _('Details'), 12,
+                ['name', 6],
+            )
+        ]
+
+    @staticmethod
+    def __groups_details__():
+        return [
+            (
+                _('Details'), 12,
+                ['name', 6],
+            )
+        ]
+
+
+class POSHardwareForm(GenModelForm):
+    class Meta:
+        model = POSHardware
+        exclude = []
+
+    def __groups__(self):
+        return [
+            (
+                _('Details'), 12,
+                ['name', 6],
+                ['token', 6],
+                ['kind', 4],
+                ['pos', 4],
+                ['enable', 4],
+                ['config', 12],
+            )
+        ]
+
+    @staticmethod
+    def __groups_details__():
+        return [
+            (
+                _('Details'), 12,
+                ['name', 6],
+                ['config', 6],
+                ['kind', 6],
+                ['token', 6],
+                ['pos', 6],
+                ['enable', 6],
+            )
+        ]
 
 
 class POSForm(GenModelForm):
     class Meta:
         model = POS
-        exclude = ['services','payments']
+        exclude = []
 
     def __groups__(self):
-        g = [
+        return [
             (
                 _('Details'), 12,
-                ['cid', 4],
-                ['key', 4],
-                ['name', 4],
+                ['name', 6],
+                ['token', 6],
+                ['zone', 6],
+                ['payments', 6],
+                ['hardware', 6],
             )
         ]
-        return g
+
+    @staticmethod
+    def __groups_details__():
+        return [
+            (
+                _('Details'), 12,
+                ['name', 6],
+                ['token', 6],
+                ['zone', 6],
+                ['payments', 6],
+                ['hardware', 6],
+            )
+        ]
 
 
 class POSSlotForm(GenModelForm):
     class Meta:
         model = POSSlot
-        exclude = ['orders', 'pos_x', 'pos_y']
+        exclude = []
 
     def __groups__(self):
-        g = [
+        return [
             (
                 _('Details'), 12,
-                ['name', 4],
-                ['pos', 4],
+                ['zone', 6],
+                ['name', 6],
             )
         ]
-        return g
 
+    @staticmethod
+    def __groups_details__():
+        return [
+            (
+                _('Details'), 12,
+                ['zone', 6],
+                ['name', 6],
+                ['orders', 6],
+                ['pos_x', 6],
+                ['pos_y', 6],
+            )
+        ]
