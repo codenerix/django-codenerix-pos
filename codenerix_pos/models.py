@@ -116,7 +116,7 @@ class POSHardware(CodenerixModel):
     name = models.CharField(_("Name"), max_length=250, blank=False, null=False, unique=True)
     enable = models.BooleanField(_('Enable'), default=True)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    config = JSONField(_("config"))
+    config = JSONField(_("config"), blank=True, null=True)
 
     def __unicode__(self):
         return self.__str__()
