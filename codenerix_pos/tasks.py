@@ -11,6 +11,7 @@ from codenerix_pos.celery import app
 
 log = logging.getLogger(__name__)
 
+
 @app.task
 def sec3(job_id, reply_channel):
     # time sleep represent some long running process
@@ -25,7 +26,7 @@ def sec3(job_id, reply_channel):
     # Send status update back to browser client
     if reply_channel is not None:
         Channel(reply_channel).send({
-            "text": json.dumps ({
+            "text": json.dumps({
                 "action": "completed",
                 "job_id": job_id,
                 # "job_name": job.name,

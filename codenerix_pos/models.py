@@ -25,17 +25,24 @@ from django.utils.translation import ugettext_lazy as _
 from jsonfield import JSONField
 
 from codenerix_payments.models import PaymentRequest
-from codenerix_invoicing.models_sales import SalesOrder
 
 from codenerix.models import CodenerixModel
+from codenerix_extensions.corporate.models import CorporateImage
+from codenerix_products.models import ProductFinal
+from codenerix_invoicing.models import BillingSeries
 
 """
+Plant
+    Zones
+    CorporateImage
+    BillingSeries
 
 Zones
     POS (pantalla fisica)
         Hardware Los que tengo (muchos)
         Hardware Los que puedo usar (muchos)
         token --- pos client (software instalado, minimo el id)
+        Salable products (POSProduct)
 
     Slot (mesas)
 
@@ -49,17 +56,19 @@ Hardware (ticket, dni, caja, dispositivo de firma, dispositivo de consulta)
 
 KIND_POSHARDWARE = (
     ("T", _("Ticket")),
-    ("D", _("DNI")), 
-    ("C", _("Cash")), 
-    ("S", _("Signature")), 
+    ("D", _("DNI")),
+    ("C", _("Cash")),
+    ("S", _("Signature")),
     ("Q", _("Query")),
 )
 
 
-class POSZone(CodenerixModel):
+class POSPlant(CodenerixModel):
     """
-    Zone
+    Plant
     """
+    corporate_image = models.ForeignKey(CorporateImage, related_name='posplants', verbose_name=_("Corporate image"), blank=False, null=False)
+    billing_series = models.ForeignKey(BillingSeries, related_name='posplants', verbose_name='Billing series', blank=False, null=False)
     name = models.CharField(_("Name"), max_length=250, blank=False, null=False, unique=True)
 
     def __unicode__(self):
@@ -70,6 +79,26 @@ class POSZone(CodenerixModel):
 
     def __fields__(self, info):
         fields = []
+        fields.append(('name', _("Name")))
+        return fields
+
+
+class POSZone(CodenerixModel):
+    """
+    Zone
+    """
+    plant = models.ForeignKey(POSPlant, related_name='zones', verbose_name=_("Plant"), blank=False, null=False)
+    name = models.CharField(_("Name"), max_length=250, blank=False, null=False, unique=True)
+
+    def __unicode__(self):
+        return self.__str__()
+
+    def __str__(self):
+        return u"{}".format(smart_text(self.name))
+
+    def __fields__(self, info):
+        fields = []
+        fields.append(('plant', _("Plant")))
         fields.append(('name', _("Name")))
         return fields
 
@@ -134,7 +163,7 @@ class POSSlot(CodenerixModel):
     '''
     zone = models.ForeignKey(POSZone, related_name='slots', verbose_name=_("Zone"))
     name = models.CharField(_("Name"), max_length=250, blank=False, null=False, unique=True)
-    orders = models.ManyToManyField(SalesOrder, related_name='slots', editable=False, verbose_name=_("Orders"))
+    # orders = models.ManyToManyField(SalesOrder, related_name='slots', editable=False, verbose_name=_("Orders"))
     pos_x = models.IntegerField(_('Pos X'), null=True, blank=True, default=None, editable=False)
     pos_y = models.IntegerField(_('Pos Y'), null=True, blank=True, default=None, editable=False)
 
@@ -148,5 +177,30 @@ class POSSlot(CodenerixModel):
         fields = []
         fields.append(('zone', _("Zone")))
         fields.append(('name', _("Name")))
-        fields.append(('orders', _("Orders")))
+        # fields.append(('orders', _("Orders")))
+        return fields
+
+
+class POSProduct(CodenerixModel):
+    """
+    Salable products in the POS
+    """
+    pos = models.ForeignKey(POS, related_name='posproducts', verbose_name=_("POS"))
+    product = models.ForeignKey(ProductFinal, related_name='posproducts', verbose_name=_("Product"))
+    enable = models.BooleanField(_('Enable'), default=True)
+
+    class Meta(CodenerixModel.Meta):
+        unique_together = (("pos", "product"))
+
+    def __unicode__(self):
+        return self.__str__()
+
+    def __str__(self):
+        return u"{} {}".format(smart_text(self.pos), smart_text(self.product))
+
+    def __fields__(self, info):
+        fields = []
+        fields.append(('pos', _("POS")))
+        fields.append(('product', _("Product")))
+        fields.append(('enable', _("Enable")))
         return fields

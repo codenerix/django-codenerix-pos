@@ -20,7 +20,11 @@
 
 from django.contrib import admin
 
-from .models import POS, POSSlot
+from .models import POS, POSSlot, POSPlant, POSZone, POSProduct, POSHardware
 
+admin.site.register(POSPlant)
+admin.site.register(POSZone)
+admin.site.register(POSHardware)
 admin.site.register(POS)
 admin.site.register(POSSlot)
+admin.site.register(POSProduct)

@@ -2,16 +2,16 @@ import json
 import logging
 from channels import Channel
 from channels.sessions import channel_session
-#from .models import Job
+# from .models import Job
 from .tasks import sec3
-#from example.celery import app
-
-log = logging.getLogger(__name__)
-
-
+# from example.celery import app
 
 from django.http import HttpResponse
 from channels.handler import AsgiHandler
+
+
+log = logging.getLogger(__name__)
+
 
 def http_consumer(message):
     # Make standard HTTP response - access ASGI path attribute directly
@@ -51,8 +51,9 @@ def ws_disconnect(message, room_name):
     # Group("chat-%s" % room_name).discard(message.reply_channel)
     pass
 
+
 def start_sec3(data, reply_channel):
-    job_id=data['job_id']
+    job_id = data['job_id']
     log.debug("job ID=%s", job_id)
     # Save model to our database
 #    job = Job(
@@ -67,8 +68,8 @@ def start_sec3(data, reply_channel):
 
     # Store the celery task id into the database if we wanted to
     # do things like cancel the task in the future
-    #job.celery_id = sec3_task.id
-    #job.save()
+    # job.celery_id = sec3_task.id
+    # job.save()
 
     # Tell client task has been started
     Channel(reply_channel).send({

@@ -22,7 +22,36 @@ from django.utils.translation import ugettext_lazy as _
 
 from codenerix.forms import GenModelForm
 
-from .models import POSZone, POSHardware, POS, POSSlot
+from .models import POSZone, POSHardware, POS, POSSlot, POSPlant, POSProduct
+
+
+class POSPlantForm(GenModelForm):
+    class Meta:
+        model = POSPlant
+        exclude = []
+
+    def __groups__(self):
+        g = [
+            (
+                _('Details'), 12,
+                ['corporate_image', 6],
+                ['billing_series', 6],
+                ['name', 6],
+            )
+        ]
+        return g
+
+    @staticmethod
+    def __groups_details__():
+        g = [
+            (
+                _('Details'), 12,
+                ['corporate_image', 6],
+                ['billing_series', 6],
+                ['name', 6],
+            )
+        ]
+        return g
 
 
 class POSZoneForm(GenModelForm):
@@ -35,6 +64,7 @@ class POSZoneForm(GenModelForm):
             (
                 _('Details'), 12,
                 ['name', 6],
+                ['plant', 6],
             )
         ]
 
@@ -44,6 +74,7 @@ class POSZoneForm(GenModelForm):
             (
                 _('Details'), 12,
                 ['name', 6],
+                ['plant', 6],
             )
         ]
 
@@ -138,3 +169,32 @@ class POSSlotForm(GenModelForm):
                 ['pos_y', 6],
             )
         ]
+
+
+class POSProductForm(GenModelForm):
+    class Meta:
+        model = POSProduct
+        exclude = []
+
+    def __groups__(self):
+        g = [
+            (
+                _('Details'), 12,
+                ['pos', 6],
+                ['product', 6],
+                ['enable', 6],
+            )
+        ]
+        return g
+
+    @staticmethod
+    def __groups_details__():
+        g = [
+            (
+                _('Details'), 12,
+                ['pos', 6],
+                ['product', 6],
+                ['enable', 6],
+            )
+        ]
+        return g
