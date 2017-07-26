@@ -23,8 +23,42 @@ from django.utils.translation import ugettext as _
 
 from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUpdateModal, GenDelete, GenDetail, GenDetailModal
 
-from .models import POSZone, POSHardware, POS, POSSlot
-from .forms import POSZoneForm, POSHardwareForm, POSForm, POSSlotForm
+from .models import POSZone, POSHardware, POS, POSSlot, POSPlant, POSProduct
+from .forms import POSZoneForm, POSHardwareForm, POSForm, POSSlotForm, POSPlantForm, POSProductForm
+
+
+# ###########################################
+# POSPlant
+class POSPlantList(GenList):
+    model = POSPlant
+    extra_context = {'menu': ['pos', 'posplant'], 'bread': [_('POS'), _('POSPlant')]}
+
+
+class POSPlantCreate(GenCreate):
+    model = POSPlant
+    form_class = POSPlantForm
+
+
+class POSPlantCreateModal(GenCreateModal, POSPlantCreate):
+    pass
+
+
+class POSPlantUpdate(GenUpdate):
+    model = POSPlant
+    form_class = POSPlantForm
+
+
+class POSPlantUpdateModal(GenUpdateModal, POSPlantUpdate):
+    pass
+
+
+class POSPlantDelete(GenDelete):
+    model = POSPlant
+
+
+class POSPlantDetails(GenDetail):
+    model = POSPlant
+    groups = POSPlantForm.__groups_details__()
 
 
 # ###########################################
@@ -205,4 +239,53 @@ class POSSlotDetails(GenDetail):
 
 
 class POSSlotDetailModal(GenDetailModal, POSSlotDetails):
+    pass
+
+
+# ###########################################
+# POSProduct
+class POSProductList(GenList):
+    model = POSProduct
+    extra_context = {'menu': ['pos', 'posproduct'], 'bread': [_('POS'), _('POSProduct')]}
+
+
+class POSProductCreate(GenCreate):
+    model = POSProduct
+    form_class = POSProductForm
+
+
+class POSProductCreateModal(GenCreateModal, POSProductCreate):
+    pass
+
+
+class POSProductUpdate(GenUpdate):
+    model = POSProduct
+    form_class = POSProductForm
+
+
+class POSProductUpdateModal(GenUpdateModal, POSProductUpdate):
+    pass
+
+
+class POSProductDelete(GenDelete):
+    model = POSProduct
+
+
+class POSProductSubList(GenList):
+    model = POSProduct
+    extra_context = {'menu': ['POSProduct', 'people'], 'bread': [_('POSProduct'), _('People')]}
+
+    def __limitQ__(self, info):
+        limit = {}
+        pk = info.kwargs.get('pk', None)
+        limit['link'] = Q(pos__pk=pk)
+        return limit
+
+
+class POSProductDetails(GenDetail):
+    model = POSProduct
+    groups = POSProductForm.__groups_details__()
+
+
+class POSProductDetailModal(GenDetailModal, POSProductDetails):
     pass
