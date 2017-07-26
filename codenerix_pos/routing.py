@@ -1,10 +1,6 @@
-from channels import route
-from codenerix_pos import consumers
+from channels import route_class
+from codenerix_pos.consumers import POSConsumer
 
 channel_routing = [
-    # Wire up websocket channels to our consumers:
-    route("http.request", consumers.http_consumer),
-    route("websocket.connect", consumers.ws_connect),
-    route("websocket.receive", consumers.ws_receive),
-    route("websocket.disconnect", consumers.ws_receive),
+    route_class(POSConsumer, path=r"^/codenerix_pos/"),
 ]
