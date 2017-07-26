@@ -15,8 +15,15 @@ $(function() {
         // Read message
         var answer=JSON.parse(message.data);
         
+        var token='EURECzbRe8mh7JTAfA';
+        
         console.log("Connected -> Start");
-        socket.send(JSON.stringify({'action':'auth', 'id':'C3PO', 'token':'a3f6c67da4b5da'}));
+        var packet={
+            'action': 'authenticate',
+            'id': 'C3PO',
+            'token': token,
+        };
+        socket.send(JSON.stringify(packet));
         if (answer.action=='reply_channel') {
                socket.send(JSON.stringify({'action':"start_sec3",'job_id':'xxx'}));
         }

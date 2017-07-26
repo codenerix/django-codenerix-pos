@@ -57,11 +57,10 @@ class POSHardwareForm(GenModelForm):
         return [
             (
                 _('Details'), 12,
-                ['name', 6],
-                ['token', 6],
-                ['kind', 4],
                 ['pos', 4],
-                ['enable', 4],
+                ['kind', 4],
+                ['name', 4],
+                ['enable', 6],
                 ['config', 12],
             )
         ]
@@ -71,12 +70,12 @@ class POSHardwareForm(GenModelForm):
         return [
             (
                 _('Details'), 12,
-                ['name', 6],
-                ['config', 6],
-                ['kind', 6],
-                ['token', 6],
                 ['pos', 6],
+                ['kind', 6],
+                ['name', 6],
                 ['enable', 6],
+                ['uuid', 6],
+                ['config', 6],
             )
         ]
 
@@ -84,16 +83,16 @@ class POSHardwareForm(GenModelForm):
 class POSForm(GenModelForm):
     class Meta:
         model = POS
-        exclude = []
+        exclude = ['payments']
 
     def __groups__(self):
         return [
             (
                 _('Details'), 12,
-                ['name', 6],
-                ['token', 6],
+                ['name', 4],
+                ['cid', 4],
+                ['token', 4],
                 ['zone', 6],
-                ['payments', 6],
                 ['hardware', 6],
             )
         ]
@@ -104,10 +103,11 @@ class POSForm(GenModelForm):
             (
                 _('Details'), 12,
                 ['name', 6],
+                ['cid', 6],
                 ['token', 6],
                 ['zone', 6],
-                ['payments', 6],
                 ['hardware', 6],
+                ['payments', 6],
             )
         ]
 

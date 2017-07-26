@@ -18,6 +18,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import uuid
+
 from django.db import models
 from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
@@ -47,12 +49,14 @@ Hardware (ticket, dni, caja, dispositivo de firma, dispositivo de consulta)
     token
 """
 
+# Changing this KEYS will affect to any client beacuse it is used for communication as a standard
 KIND_POSHARDWARE = (
-    ("T", _("Ticket")),
-    ("D", _("DNI")), 
-    ("C", _("Cash")), 
-    ("S", _("Signature")), 
-    ("Q", _("Query")),
+    ("TICKET", _("Ticket printer")),
+    ("DNIE", _("DNIe card reader")),
+    ("CASH", _("Cash drawer")),
+    ("WEIGHT", _("Weight")),
+    ("SIGN", _("Signature pad")),
+    ("QUERY", _("Query service (Ex: Barcode)")),  # Barcode reader, Point of Information for clients, etc...
 )
 
 
@@ -78,12 +82,12 @@ class POSHardware(CodenerixModel):
     """
     Hardware
     """
-    name = models.CharField(_("Name"), max_length=250, blank=False, null=False, unique=True)
-    config = JSONField(_("config"))
-    kind = models.CharField(_("Kind"), max_length=1, choices=KIND_POSHARDWARE, blank=False, null=False)
-    token = models.CharField(_("Token"), max_length=40, blank=True, null=True)
     pos = models.ForeignKey("POS", related_name='hardwares', verbose_name=_("Hardware"), blank=True, null=True)
+    kind = models.CharField(_("Kind"), max_length=6, choices=KIND_POSHARDWARE, blank=False, null=False)
+    name = models.CharField(_("Name"), max_length=250, blank=False, null=False, unique=True)
     enable = models.BooleanField(_('Enable'), default=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    config = JSONField(_("config"))
 
     def __unicode__(self):
         return self.__str__()
@@ -93,12 +97,12 @@ class POSHardware(CodenerixModel):
 
     def __fields__(self, info):
         fields = []
-        fields.append(('name', _("Name")))
-        fields.append(('config', _("Config")))
-        fields.append(('kind', _("Kind")))
-        fields.append(('token', _("Token")))
         fields.append(('pos', _("POS")))
+        fields.append(('get_kind_display', _("Kind")))
+        fields.append(('name', _("Name")))
         fields.append(('enable', _("Enable")))
+        fields.append(('uuid', _("UUID")))
+        fields.append(('config', _("Config")))
         return fields
 
 
@@ -107,11 +111,12 @@ class POS(CodenerixModel):
     Point of Service
     '''
     name = models.CharField(_("Name"), max_length=250, blank=False, null=False, unique=True)
+    cid = models.CharField(_("CID"), max_length=20, blank=True, null=True, unique=True)
     token = models.CharField(_("Token"), max_length=40, blank=False, null=False, unique=True)
     zone = models.ForeignKey(POSZone, related_name='poss', verbose_name=_("Zone"))
     payments = models.ManyToManyField(PaymentRequest, related_name='poss', verbose_name=_("Payments"), blank=True, null=True)
     # Hardware that can use
-    hardware = models.ManyToManyField(POSHardware, related_name='poss', verbose_name=_("Hardware"), blank=True, null=True)
+    hardware = models.ManyToManyField(POSHardware, related_name='poss', verbose_name=_("Hardware it can use"), blank=True, null=True)
 
     def __unicode__(self):
         return self.__str__()
@@ -123,6 +128,7 @@ class POS(CodenerixModel):
         fields = []
         fields.append(('zone', _("Zone")))
         fields.append(('name', _("Name")))
+        fields.append(('cid', _("CID")))
         fields.append(('token', _("Token")))
         fields.append(('hardware', _("Hardware")))
         return fields
