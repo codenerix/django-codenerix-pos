@@ -18,13 +18,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import random
+import string
+
 from django.db.models import Q
 from django.utils.translation import ugettext as _
 
 from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUpdateModal, GenDelete, GenDetail, GenDetailModal
 
 from .models import POSZone, POSHardware, POS, POSSlot, POSPlant, POSProduct
-from .forms import POSZoneForm, POSHardwareForm, POSForm, POSSlotForm, POSPlantForm, POSProductForm
+from .forms import POSZoneForm, POSHardwareForm, POSForm, POSFormCreate, POSSlotForm, POSPlantForm, POSProductForm
 
 
 # ###########################################
@@ -153,7 +156,12 @@ class POSList(GenList):
 
 class POSCreate(GenCreate):
     model = POS
-    form_class = POSForm
+    form_class = POSFormCreate
+
+    def get_form(self, *args, **kwargs):
+        form = super(POSCreate, self).get_form(*args, **kwargs)
+        form.fields["key"].initial = ''.join(random.SystemRandom().choice(string.ascii_letters + string.digits) for _ in range(32))
+        return form
 
 
 class POSCreateModal(GenCreateModal, POSCreate):

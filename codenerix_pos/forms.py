@@ -18,6 +18,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from django import forms
 from django.utils.translation import ugettext_lazy as _
 
 from codenerix.forms import GenModelForm
@@ -111,7 +112,28 @@ class POSHardwareForm(GenModelForm):
         ]
 
 
+class POSFormCreate(GenModelForm):
+    key = forms.CharField(min_length=32, max_length=32, widget=forms.widgets.HiddenInput(), required=True)
+
+    class Meta:
+        model = POS
+        exclude = ['payments']
+
+    def __groups__(self):
+        return [
+            (
+                _('Details'), 12,
+                ['name', 3],
+                ['cid', 3],
+                ['zone', 3],
+                ['hardware', 3],
+            )
+        ]
+
+
 class POSForm(GenModelForm):
+    key = forms.CharField(label=_("Key"), min_length=32, max_length=32, widget=forms.widgets.Input(), required=True)
+
     class Meta:
         model = POS
         exclude = ['payments']
@@ -122,7 +144,7 @@ class POSForm(GenModelForm):
                 _('Details'), 12,
                 ['name', 4],
                 ['cid', 4],
-                ['token', 4],
+                ['key', 4],
                 ['zone', 6],
                 ['hardware', 6],
             )
@@ -135,7 +157,7 @@ class POSForm(GenModelForm):
                 _('Details'), 12,
                 ['name', 6],
                 ['cid', 6],
-                ['token', 6],
+                ['key', 6],
                 ['zone', 6],
                 ['hardware', 6],
                 ['payments', 6],
