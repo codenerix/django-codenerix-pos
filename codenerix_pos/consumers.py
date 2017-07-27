@@ -53,7 +53,7 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
         super(POSConsumer, self).send(query)
 
     def receive(self, request, **kwargs):
-        self.debug("New message arrived: {}".format(request), color='yellow')
+        self.debug("New message arrived", color='yellow')
 
         if isinstance(request, dict):
             # Check if we got msg
@@ -74,6 +74,7 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
                     except Exception:
                         query = None
                     if query is not None and isinstance(query, dict):
+                        self.debug("Receive: {}".format(query), color='cyan')
                         self.recv(query, pos)
                     else:
                         if query is None:
@@ -94,9 +95,7 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
         """
         Called when a message is received with decoded JSON content
         """
-        self.debug("")
         self.debug("Receive: {}".format(message), color="cyan")
-        self.debug("    POS: {}".format(pos), color='purple')
 
         action = message.get('action', None)
 
@@ -104,11 +103,12 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
         if action == 'get_config':
             # Get all the hardware connected to this POS
             answer = {}
+            answer['action'] = 'config'
             answer['hardware'] = []
             for hw in pos.hardwares.all():
                 # Prepare to send back the config
-                answer['hardware'].append({'kind': hw.kind, 'config': hw.config})
-            self.debug("Send:{}".format(answer), color='green')
+                answer['hardware'].append({'kind': hw.kind, 'config': hw.config, 'uuid': hw.uuid.hex})
+            self.debug("{} - Send:{}".format(pos, answer), color='green')
             self.send(answer, pos)
         elif action == 'HOLA':
             print("HOLA")
