@@ -1,4 +1,5 @@
 import json
+import uuid
 
 from channels.generic.websockets import JsonWebsocketConsumer
 
@@ -61,28 +62,34 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
             if message is not None:
 
                 # Get data from the package
-                cid = request.get('id', '')
+                uuidtxt = request.get('uuid', '')
 
-                # Try to locate the POS in the database
-                pos = POS.objects.filter(cid=cid).first()
+                if uuidtxt is not None:
+                    uid = uuid.UUID(uuidtxt)
 
-                if pos:
-                    # Decrypt message
-                    msg = self.crypto.decrypt(message, pos.key)
-                    try:
-                        query = json.loads(msg)
-                    except Exception:
-                        query = None
-                    if query is not None and isinstance(query, dict):
-                        self.debug("Receive: {}".format(query), color='cyan')
-                        self.recv(query, pos)
-                    else:
-                        if query is None:
-                            self.send_error("Message is not JSON or is None", pos)
+                    # Try to locate the POS in the database
+                    pos = POS.objects.filter(uuid=uid).first()
+
+                    if pos:
+                        # Decrypt message
+                        msg = self.crypto.decrypt(message, pos.key)
+                        try:
+                            query = json.loads(msg)
+                        except Exception:
+                            query = None
+                        if query is not None and isinstance(query, dict):
+                            self.debug("Receive: {}".format(query), color='cyan')
+                            self.recv(query, pos)
                         else:
-                            self.send_error("Message must be a Dictionary", pos)
+                            if query is None:
+                                self.send_error("Message is not JSON or is None", pos)
+                            else:
+                                self.send_error("Message must be a Dictionary", pos)
+                    else:
+                        # Not found in the database, not authorized!
+                        self.send_error("Not authorized!")
+
                 else:
-                    # Not found in the database, not authorized!
                     self.send_error("Not authorized!")
 
             else:

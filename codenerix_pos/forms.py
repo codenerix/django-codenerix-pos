@@ -117,14 +117,13 @@ class POSFormCreate(GenModelForm):
 
     class Meta:
         model = POS
-        exclude = ['payments']
+        exclude = ['payments', 'uuid']
 
     def __groups__(self):
         return [
             (
                 _('Details'), 12,
                 ['name', 3],
-                ['cid', 3],
                 ['zone', 3],
                 ['hardware', 3],
             )
@@ -136,14 +135,13 @@ class POSForm(GenModelForm):
 
     class Meta:
         model = POS
-        exclude = ['payments']
+        exclude = ['payments', 'uuid']
 
     def __groups__(self):
         return [
             (
                 _('Details'), 12,
                 ['name', 4],
-                ['cid', 4],
                 ['key', 4],
                 ['zone', 6],
                 ['hardware', 6],
@@ -156,7 +154,7 @@ class POSForm(GenModelForm):
             (
                 _('Details'), 12,
                 ['name', 6],
-                ['cid', 6],
+                ['uuid', 6],
                 ['key', 6],
                 ['zone', 6],
                 ['hardware', 6],

@@ -140,7 +140,7 @@ class POS(CodenerixModel):
     Point of Service
     '''
     name = models.CharField(_("Name"), max_length=250, blank=False, null=False, unique=True)
-    cid = models.CharField(_("CID"), max_length=20, blank=True, null=True, unique=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     key = models.CharField(_("Key"), max_length=32, blank=False, null=False, unique=True)
     zone = models.ForeignKey(POSZone, related_name='poss', verbose_name=_("Zone"))
     payments = models.ManyToManyField(PaymentRequest, related_name='poss', verbose_name=_("Payments"), blank=True, null=True)
@@ -157,7 +157,7 @@ class POS(CodenerixModel):
         fields = []
         fields.append(('zone', _("Zone")))
         fields.append(('name', _("Name")))
-        fields.append(('cid', _("CID")))
+        fields.append(('uuid', _("UUID")))
         fields.append(('key', _("Key")))
         fields.append(('hardware', _("Hardware")))
         return fields
