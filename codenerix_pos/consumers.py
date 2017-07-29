@@ -33,12 +33,14 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
         self.warning("Client got disconnected")
 
     def send_error(self, msg, pos=None):
-        answer = {'error': True, 'errortxt': msg}
+        answer = {'action': 'error', 'error': msg}
         if pos is None:
             # Use basic send (unprotected)
-            super(POSConsumer, self).send(json.dumps(answer))
+            self.warning("Send '{}' to Anonymous".format(msg))
+            super(POSConsumer, self).send({'message': json.dumps(answer)})
         else:
             # Use normal send (protected)
+            self.warning("Send '{}' to {}".format(msg, pos))
             self.send(answer, pos)
 
     def send(self, request, pos):
@@ -54,7 +56,7 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
         super(POSConsumer, self).send(query)
 
     def receive(self, request, **kwargs):
-        self.debug("New message arrived", color='yellow')
+        # self.debug("New message arrived: {}".format(request), color='yellow')
 
         if isinstance(request, dict):
             # Check if we got msg
@@ -62,7 +64,7 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
             if message is not None:
 
                 # Get data from the package
-                uuidtxt = request.get('uuid', '')
+                uuidtxt = request.get('uuid', None)
 
                 if uuidtxt is not None:
                     uid = uuid.UUID(uuidtxt)
@@ -117,8 +119,8 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
                 answer['hardware'].append({'kind': hw.kind, 'config': hw.config, 'uuid': hw.uuid.hex})
             self.debug("{} - Send:{}".format(pos, answer), color='green')
             self.send(answer, pos)
-        elif action == 'HOLA':
-            print("HOLA")
+        elif action == 'error':
+            self.error("Got an error from {}: {}".format(pos.uuid, message.get('error', 'No error')))
         else:
             # Unknown action
             self.send_error("Unknown action '{}'".format(action), pos)
