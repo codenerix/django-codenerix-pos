@@ -4,7 +4,7 @@ import uuid
 from channels.generic.websockets import JsonWebsocketConsumer
 
 from codenerix.lib.debugger import Debugger
-from codenerix_pos.models import POS
+from codenerix_pos.models import POS, POSHardware
 from codenerix_extensions.lib.cryptography import AESCipher
 
 
@@ -80,7 +80,6 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
                         except Exception:
                             query = None
                         if query is not None and isinstance(query, dict):
-                            self.debug("Receive: {}".format(query), color='cyan')
                             self.recv(query, pos)
                         else:
                             if query is None:
@@ -114,11 +113,23 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
             answer = {}
             answer['action'] = 'config'
             answer['hardware'] = []
-            for hw in pos.hardwares.all():
+            for hw in pos.hardwares.filter(enable=True):
                 # Prepare to send back the config
                 answer['hardware'].append({'kind': hw.kind, 'config': hw.config, 'uuid': hw.uuid.hex})
             self.debug("{} - Send:{}".format(pos, answer), color='green')
             self.send(answer, pos)
+        elif action == 'msg':
+            uid = message.get('uuid', None)
+            msg = message.get('msg', None)
+            if uid:
+                origin = POSHardware.objects.filter(uuid=uuid.UUID(uid)).first()
+                if origin:
+                    self.debug("Got a message from {}: {}".format(origin.uuid, msg), color='purple')
+                    origin.recv(msg)
+                else:
+                    self.debug("Got a message from UNKNOWN {}: {}".format(uid, msg), color='purple')
+            else:
+                self.debug("Got a message from NO-UUID: {}".format(msg), color='purple')
         elif action == 'error':
             self.error("Got an error from {}: {}".format(pos.uuid, message.get('error', 'No error')))
         else:

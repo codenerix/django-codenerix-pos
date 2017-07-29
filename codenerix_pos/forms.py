@@ -83,7 +83,7 @@ class POSZoneForm(GenModelForm):
 class POSHardwareForm(GenModelForm):
     class Meta:
         model = POSHardware
-        exclude = []
+        exclude = ['value']
 
     def __groups__(self):
         return [
@@ -108,6 +108,7 @@ class POSHardwareForm(GenModelForm):
                 ['enable', 6],
                 ['uuid', 6],
                 ['config', 6],
+                ['value', 6],
             )
         ]
 

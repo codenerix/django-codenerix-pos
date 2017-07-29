@@ -117,6 +117,7 @@ class POSHardware(CodenerixModel):
     enable = models.BooleanField(_('Enable'), default=True)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     config = JSONField(_("config"), blank=True, null=True)
+    value = JSONField(_("config"), blank=True, null=True)
 
     def __unicode__(self):
         return self.__str__()
@@ -132,7 +133,12 @@ class POSHardware(CodenerixModel):
         fields.append(('enable', _("Enable")))
         fields.append(('uuid', _("UUID")))
         fields.append(('config', _("Config")))
+        fields.append(('value', _("Value")))
         return fields
+
+    def recv(self, msg):
+        self.value = msg
+        self.save()
 
 
 class POS(CodenerixModel):
