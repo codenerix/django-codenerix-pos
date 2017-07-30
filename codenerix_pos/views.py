@@ -26,7 +26,7 @@ from django.utils.translation import ugettext as _
 
 from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUpdateModal, GenDelete, GenDetail, GenDetailModal
 
-from .models import POSZone, POSHardware, POS, POSSlot, POSPlant, POSProduct
+from .models import POSZone, POSHardware, POS, POSSlot, POSPlant, POSProduct, POSLog
 from .forms import POSZoneForm, POSHardwareForm, POSForm, POSFormCreate, POSSlotForm, POSPlantForm, POSProductForm
 
 
@@ -34,7 +34,7 @@ from .forms import POSZoneForm, POSHardwareForm, POSForm, POSFormCreate, POSSlot
 # POSPlant
 class POSPlantList(GenList):
     model = POSPlant
-    extra_context = {'menu': ['pos', 'posplant'], 'bread': [_('POS'), _('POSPlant')]}
+    extra_context = {'menu': ['pos', 'posplant'], 'bread': [_('POS'), _('Plant')]}
 
 
 class POSPlantCreate(GenCreate):
@@ -68,7 +68,7 @@ class POSPlantDetails(GenDetail):
 # POSZone
 class POSZoneList(GenList):
     model = POSZone
-    extra_context = {'menu': ['pos', 'poszone'], 'bread': [_('POS'), _('POSZone'), ]}
+    extra_context = {'menu': ['pos', 'poszone'], 'bread': [_('POS'), _('Zone'), ]}
 
 
 class POSZoneCreate(GenCreate):
@@ -102,7 +102,7 @@ class POSZoneDetails(GenDetail):
 # POSHardware
 class POSHardwareList(GenList):
     model = POSHardware
-    extra_context = {'menu': ['pos', 'poshardware'], 'bread': [_('POS'), _('POSHardware'), ]}
+    extra_context = {'menu': ['pos', 'poshardware'], 'bread': [_('POS'), _('Hardware'), ]}
 
 
 class POSHardwareCreate(GenCreate):
@@ -129,7 +129,7 @@ class POSHardwareDelete(GenDelete):
 
 class POSHardwareSubList(GenList):
     model = POSHardware
-    extra_context = {'menu': ['pos', 'poshardware'], 'bread': [_('POS'), _('POSHardware'), ]}
+    extra_context = {'menu': ['pos', 'poshardware'], 'bread': [_('POS'), _('Hardware'), ]}
 
     def __limitQ__(self, info):
         limit = {}
@@ -205,7 +205,7 @@ class POSDetailModal(GenDetailModal, POSDetails):
 # POSSlot
 class POSSlotList(GenList):
     model = POSSlot
-    extra_context = {'menu': ['pos', 'posslot'], 'bread': [_('POS'), _('POSSlot'), ]}
+    extra_context = {'menu': ['pos', 'posslot'], 'bread': [_('POS'), _('Slot'), ]}
 
 
 class POSSlotCreate(GenCreate):
@@ -232,7 +232,7 @@ class POSSlotDelete(GenDelete):
 
 class POSSlotSubList(GenList):
     model = POSSlot
-    extra_context = {'menu': ['pos', 'posslot'], 'bread': [_('POS'), _('POSSlot'), ]}
+    extra_context = {'menu': ['pos', 'posslot'], 'bread': [_('POS'), _('Slot'), ]}
 
     def __limitQ__(self, info):
         limit = {}
@@ -254,7 +254,7 @@ class POSSlotDetailModal(GenDetailModal, POSSlotDetails):
 # POSProduct
 class POSProductList(GenList):
     model = POSProduct
-    extra_context = {'menu': ['pos', 'posproduct'], 'bread': [_('POS'), _('POSProduct')]}
+    extra_context = {'menu': ['pos', 'posproduct'], 'bread': [_('POS'), _('Product')]}
 
 
 class POSProductCreate(GenCreate):
@@ -297,3 +297,14 @@ class POSProductDetails(GenDetail):
 
 class POSProductDetailModal(GenDetailModal, POSProductDetails):
     pass
+
+
+# ###########################################
+# POSLog
+class POSLogList(GenList):
+    model = POSLog
+    extra_context = {'menu': ['pos', 'poslog'], 'bread': [_('POS'), _('Log')]}
+    default_ordering = '-pk'
+    linkadd = False
+    linkedit = False
+    search_filter_button = True

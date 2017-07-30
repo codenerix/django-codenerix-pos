@@ -4,7 +4,7 @@ import uuid
 from channels.generic.websockets import JsonWebsocketConsumer
 
 from codenerix.lib.debugger import Debugger
-from codenerix_pos.models import POS, POSHardware
+from codenerix_pos.models import POS, POSHardware, POSLog
 from codenerix_extensions.lib.cryptography import AESCipher
 
 
@@ -133,8 +133,28 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
                     self.debug("Got a message from UNKNOWN {}: {}".format(uid, msg), color='purple')
             else:
                 self.debug("Got a message from NO-UUID: {}".format(msg), color='purple')
+        elif action == 'ping':
+            super(POSConsumer, self).send({'message': json.dumps({'action': 'pong'})})
+        elif action == 'pong':
+            self.debug("Got PONG {}".format(message.get('ref', '-')), color='white')
         elif action == 'error':
-            self.error("Got an error from {}: {}".format(pos.uuid, message.get('error', 'No error')))
+            uid = message.get('uuid', None)
+            msg = message.get('error', 'No error')
+            if uid:
+                self.error("Got an error from {}: {} (UUID:{})".format(pos.uuid, msg, uid))
+            else:
+                self.error("Got an error from {}: {})".format(pos.uuid, msg))
+            log = POSLog()
+            log.pos = pos
+            if uid:
+                poshw = POSHardware.objects.filter(uuid=uid).first()
+                if poshw:
+                    log.poshw = poshw
+                    log.uuid = poshw.uuid
+            else:
+                log.uuid = pos.uuid
+            log.log = message.get('error', None)
+            log.save()
         else:
             # Unknown action
             self.send_error("Unknown action '{}'".format(action), pos)

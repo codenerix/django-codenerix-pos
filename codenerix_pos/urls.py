@@ -27,10 +27,11 @@ from .views import POSList, POSCreate, POSCreateModal, POSUpdate, POSUpdateModal
 from .views import POSSlotList, POSSlotCreate, POSSlotCreateModal, POSSlotUpdate, POSSlotUpdateModal, POSSlotDelete, POSSlotSubList, POSSlotDetails, POSSlotDetailModal
 from .views import POSPlantList, POSPlantCreate, POSPlantCreateModal, POSPlantUpdate, POSPlantUpdateModal, POSPlantDelete, POSPlantDetails
 from .views import POSProductList, POSProductCreate, POSProductCreateModal, POSProductUpdate, POSProductUpdateModal, POSProductDelete, POSProductSubList, POSProductDetails, POSProductDetailModal
+from .views import POSLogList
 
 urlpatterns = [
     url(r'^example$', TemplateView.as_view(template_name='codenerix_pos/example.html'), name='CDNX_pos_example'),
-    
+
     url(r'^posplants$', POSPlantList.as_view(), name='CDNX_posplants_list'),
     url(r'^posplants/add$', POSPlantCreate.as_view(), name='CDNX_posplants_add'),
     url(r'^posplants/addmodal$', POSPlantCreateModal.as_view(), name='CDNX_posplants_addmodal'),
@@ -112,4 +113,5 @@ urlpatterns = [
     url(r'^posproducts/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/editmodal$', POSProductUpdateModal.as_view(), name='CDNX_posproducts_sublist_editmodal'),
     url(r'^posproducts/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/delete$', POSProductDelete.as_view(), name='CDNX_posproducts_sublist_delete'),
 
+    url(r'^poslogs$', POSLogList.as_view(), name='CDNX_poslogs_list'),
 ]

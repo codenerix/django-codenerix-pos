@@ -20,11 +20,13 @@
 
 import json
 import uuid
+import hashlib
 from channels import Channel
 
 from django.db import models
 from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
+from django.db.models import Q
 
 from jsonfield import JSONField
 
@@ -220,6 +222,15 @@ class POS(CodenerixModel):
     def reset_client(self):
         self.send({'action': 'reset'})
 
+    def ping(self, uid=None):
+        if uid is None:
+            uidtxt = None
+        else:
+            uidtxt = uid.hex
+        ref = hashlib.sha1(uuid.uuid4().hex.encode('utf-8')).hexdigest()
+        self.send({'action': 'ping', 'ref': ref, 'uuid': uidtxt})
+        return ref
+
     def send(self, data, uid=None):
 
         if uid:
@@ -290,3 +301,40 @@ class POSProduct(CodenerixModel):
         fields.append(('product', _("Product")))
         fields.append(('enable', _("Enable")))
         return fields
+
+
+class POSLog(CodenerixModel):
+    """
+    LOG for POS
+    """
+    pos = models.ForeignKey(POS, related_name='logs', verbose_name=_("POS"), editable=False, null=True)
+    poshw = models.ForeignKey(POSHardware, related_name='logs', verbose_name=_("POS"), editable=False, null=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    log = JSONField(_("LOG"), blank=True, null=True)
+
+    def __unicode__(self):
+        return self.__str__()
+
+    def __str__(self):
+        return self.uuid.hex
+
+    def __fields__(self, info):
+        fields = []
+        fields.append(('created', _("Created")))
+        fields.append(('uuid', _("UUID")))
+        fields.append(('pos', _("POS")))
+        fields.append(('poshw', _("POSHardware")))
+        fields.append(('log', _("Log")))
+        return fields
+
+    def __searchF__(self, info):
+
+        # Build both lists
+        poss = [(pos.pk, pos.name) for pos in POS.objects.all()]
+        poshws = [(poshw.pk, poshw.name) for poshw in POSHardware.objects.all()]
+
+        tf = {}
+        tf['uuid'] = (_('UUID'), lambda x: Q(uuid__icontains=x), 'input')
+        tf['pos'] = (_('POS'), lambda x: Q(pos__pk=x), poss)
+        tf['poshw'] = (_('Hardware'), lambda x: Q(poshw__pk=x), poshws)
+        return tf
