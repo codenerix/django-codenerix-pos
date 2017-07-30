@@ -80,6 +80,8 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
                         except Exception:
                             query = None
                         if query is not None and isinstance(query, dict):
+                            pos.channel = str(self.message.reply_channel)
+                            pos.save(doreset=False)
                             self.recv(query, pos)
                         else:
                             if query is None:
@@ -103,6 +105,7 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
         """
         Called when a message is received with decoded JSON content
         """
+
         self.debug("Receive: {}".format(message), color="cyan")
 
         action = message.get('action', None)
@@ -116,7 +119,7 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
             for hw in pos.hardwares.filter(enable=True):
                 # Prepare to send back the config
                 answer['hardware'].append({'kind': hw.kind, 'config': hw.config, 'uuid': hw.uuid.hex})
-            self.debug("{} - Send:{}".format(pos, answer), color='green')
+            self.debug("{} - Send: {}".format(pos, answer), color='green')
             self.send(answer, pos)
         elif action == 'msg':
             uid = message.get('uuid', None)

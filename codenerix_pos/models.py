@@ -18,7 +18,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import uuid
+from channels import Channel
 
 from django.db import models
 from django.utils.encoding import smart_text
@@ -32,6 +34,7 @@ from codenerix.models import CodenerixModel
 from codenerix_extensions.corporate.models import CorporateImage
 from codenerix_products.models import ProductFinal
 from codenerix_invoicing.models import BillingSeries
+from codenerix_extensions.lib.cryptography import AESCipher
 
 """
 Plant
@@ -136,9 +139,43 @@ class POSHardware(CodenerixModel):
         fields.append(('value', _("Value")))
         return fields
 
+    def save(self, *args, **kwargs):
+        if 'doreset' in kwargs:
+            doreset = kwargs.pop('doreset')
+        else:
+            doreset = True
+
+        result = super(POSHardware, self).save(*args, **kwargs)
+        if doreset:
+            self.pos.reset_client()
+        return result
+
     def recv(self, msg):
         self.value = msg
-        self.save()
+        self.save(doreset=False)
+
+    def send(self, msg=None):
+        '''
+        Example of msg for each POSHARDWARE:
+            TICKET: {'data': 'print this text, process thid dictionary or take my money'}
+            CASH:   {'data': '...ANYTHING except None to open the Cash Drawer...' }
+            DNIE:   {'data': '...ANYTHING except None to get again data from DNIe if connected...' }
+            WEIGHT: {'data': '...ANYTHING except None to get the value of the last wegith' }
+            SIGN:   --- NOT ALLOWED / NOT AVAILABLE ---
+            QUERY:  --- NOT ALLOWED / NOT AVAILABLE ---
+        '''
+        if self.kind == 'TICKET':
+            if msg is not None:
+                data = msg
+            else:
+                raise IOError("Nothing to print???")
+        elif self.kind in ['CASH', 'DNIE', 'WEIGHT']:
+            data = 'DOIT'
+        else:
+            raise IOError("This Hardware can not send data anywhere")
+
+        # Say it to send this message
+        self.pos.send(data, self.uuid)
 
 
 class POS(CodenerixModel):
@@ -150,6 +187,7 @@ class POS(CodenerixModel):
     key = models.CharField(_("Key"), max_length=32, blank=False, null=False, unique=True)
     zone = models.ForeignKey(POSZone, related_name='poss', verbose_name=_("Zone"))
     payments = models.ManyToManyField(PaymentRequest, related_name='poss', verbose_name=_("Payments"), blank=True, null=True)
+    channel = models.CharField(_("Channel"), max_length=50, blank=True, null=True, unique=True, editable=False)
     # Hardware that can use
     hardware = models.ManyToManyField(POSHardware, related_name='poss', verbose_name=_("Hardware it can use"), blank=True, null=True)
 
@@ -165,8 +203,44 @@ class POS(CodenerixModel):
         fields.append(('name', _("Name")))
         fields.append(('uuid', _("UUID")))
         fields.append(('key', _("Key")))
+        fields.append(('channel', _("Channel")))
         fields.append(('hardware', _("Hardware")))
         return fields
+
+    def save(self, *args, **kwargs):
+        if 'doreset' in kwargs:
+            doreset = kwargs.pop('doreset')
+        else:
+            doreset = True
+        result = super(POS, self).save(*args, **kwargs)
+        if doreset:
+            self.reset_client()
+        return result
+
+    def reset_client(self):
+        self.send({'action': 'reset'})
+
+    def send(self, data, uid=None):
+
+        if uid:
+            # Message for some client
+            message = {
+                'action': 'msg',
+                'message': {
+                    'data': data,
+                },
+                'uuid': uid.hex,
+            }
+        else:
+            # Message for the server
+            message = data
+
+        # Send message
+        crypto = AESCipher()
+        msg = json.dumps(message)
+        request = crypto.encrypt(msg, self.key).decode('utf-8')
+        data = json.dumps({'message': request})
+        Channel(self.channel).send({'text': data})
 
 
 class POSSlot(CodenerixModel):
