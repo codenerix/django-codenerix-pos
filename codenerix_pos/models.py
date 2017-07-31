@@ -62,8 +62,9 @@ Hardware (ticket, dni, caja, dispositivo de firma, dispositivo de consulta)
 """
 
 # Changing this KEYS will affect to any client beacuse it is used for communication as a standard
+KIND_POSHARDWARE_TICKET = "TICKET"
 KIND_POSHARDWARE = (
-    ("TICKET", _("Ticket printer")),
+    (KIND_POSHARDWARE_TICKET, _("Ticket printer")),
     ("DNIE", _("DNIe card reader")),
     ("CASH", _("Cash drawer")),
     ("WEIGHT", _("Weight")),
