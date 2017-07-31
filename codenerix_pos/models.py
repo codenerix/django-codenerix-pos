@@ -156,7 +156,7 @@ class POSHardware(CodenerixModel):
         self.value = msg
         self.save(doreset=False)
 
-    def send(self, msg=None):
+    def send(self, msg=None, ref=None):
         '''
         Example of msg for each POSHARDWARE:
             TICKET: {'data': 'print this text, process thid dictionary or take my money'}
@@ -177,7 +177,7 @@ class POSHardware(CodenerixModel):
             raise IOError("This Hardware can not send data anywhere")
 
         # Say it to send this message
-        self.pos.send(data, self.uuid)
+        self.pos.send(data, ref, self.uuid)
 
 
 class POS(CodenerixModel):
@@ -231,7 +231,7 @@ class POS(CodenerixModel):
         self.send({'action': 'ping', 'ref': ref, 'uuid': uidtxt})
         return ref
 
-    def send(self, data, uid=None):
+    def send(self, data, ref=None, uid=None):
 
         if uid:
             # Message for some client
@@ -248,7 +248,7 @@ class POS(CodenerixModel):
 
         # Send message
         crypto = AESCipher()
-        msg = json.dumps(message)
+        msg = json.dumps({'request': message, 'ref': ref})
         request = crypto.encrypt(msg, self.key).decode('utf-8')
         data = json.dumps({'message': request})
         Channel(self.channel).send({'text': data})

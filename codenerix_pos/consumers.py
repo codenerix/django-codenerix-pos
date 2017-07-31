@@ -32,7 +32,7 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
     def disconnect(self, message, **kwargs):
         self.warning("Client got disconnected")
 
-    def send_error(self, msg, pos=None):
+    def send_error(self, msg, ref=None, pos=None):
         answer = {'action': 'error', 'error': msg}
         if pos is None:
             # Use basic send (unprotected)
@@ -41,11 +41,11 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
         else:
             # Use normal send (protected)
             self.warning("Send '{}' to {}".format(msg, pos))
-            self.send(answer, pos)
+            self.send(answer, ref, pos)
 
-    def send(self, request, pos):
+    def send(self, request, ref=None, pos=None):
         # Encode request
-        msg = json.dumps(request)
+        msg = json.dumps({'request': request, 'ref': ref})
 
         # Build query
         query = {
@@ -79,15 +79,21 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
                             query = json.loads(msg)
                         except Exception:
                             query = None
-                        if query is not None and isinstance(query, dict):
-                            pos.channel = str(self.message.reply_channel)
-                            pos.save(doreset=False)
-                            self.recv(query, pos)
-                        else:
-                            if query is None:
-                                self.send_error("Message is not JSON or is None", pos)
+
+                        request = query.get('request', None)
+                        if request is not None:
+                            ref = query.get('ref', None)
+                            if request is not None and isinstance(request, dict):
+                                pos.channel = str(self.message.reply_channel)
+                                pos.save(doreset=False)
+                                self.recv(request, ref, pos)
                             else:
-                                self.send_error("Message must be a Dictionary", pos)
+                                if request is None:
+                                    self.send_error("Message is not JSON or is None", ref, pos)
+                                else:
+                                    self.send_error("Message must be a Dictionary", ref, pos)
+                        else:
+                            self.send_error("Message doesn't belong to CODENERIX POS")
                     else:
                         # Not found in the database, not authorized!
                         self.send_error("Not authorized!")
@@ -101,12 +107,12 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
         else:
             self.send_error("This server only accepts dictionaries")
 
-    def recv(self, message, pos):
+    def recv(self, message, ref, pos):
         """
         Called when a message is received with decoded JSON content
         """
 
-        self.debug("Receive: {}".format(message), color="cyan")
+        self.debug("Receive: {} (ref:{})".format(message, ref), color="cyan")
 
         action = message.get('action', None)
 
@@ -120,30 +126,30 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
                 # Prepare to send back the config
                 answer['hardware'].append({'kind': hw.kind, 'config': hw.config, 'uuid': hw.uuid.hex})
             self.debug("{} - Send: {}".format(pos, answer), color='green')
-            self.send(answer, pos)
+            self.send(answer, ref, pos)
         elif action == 'msg':
             uid = message.get('uuid', None)
             msg = message.get('msg', None)
             if uid:
                 origin = POSHardware.objects.filter(uuid=uuid.UUID(uid)).first()
                 if origin:
-                    self.debug("Got a message from {}: {}".format(origin.uuid, msg), color='purple')
+                    self.debug("Got a message from {}: {} (ref:{})".format(origin.uuid, msg, ref), color='purple')
                     origin.recv(msg)
                 else:
-                    self.debug("Got a message from UNKNOWN {}: {}".format(uid, msg), color='purple')
+                    self.debug("Got a message from UNKNOWN {}: {} (ref:{})".format(uid, msg, ref), color='purple')
             else:
-                self.debug("Got a message from NO-UUID: {}".format(msg), color='purple')
+                self.debug("Got a message from NO-UUID: {} (ref:{})".format(msg, ref), color='purple')
         elif action == 'ping':
-            super(POSConsumer, self).send({'message': json.dumps({'action': 'pong'})})
+            super(POSConsumer, self).send({'message': json.dumps({'action': 'pong', 'ref': ref})})
         elif action == 'pong':
-            self.debug("Got PONG {}".format(message.get('ref', '-')), color='white')
+            self.debug("Got PONG {} (ref:{})".format(message.get('ref', '-'), ref), color='white')
         elif action == 'error':
             uid = message.get('uuid', None)
             msg = message.get('error', 'No error')
             if uid:
-                self.error("Got an error from {}: {} (UUID:{})".format(pos.uuid, msg, uid))
+                self.error("Got an error from {}: {} (UUID:{}) (ref:{})".format(pos.uuid, msg, uid, ref))
             else:
-                self.error("Got an error from {}: {})".format(pos.uuid, msg))
+                self.error("Got an error from {}: {}) (ref:{})".format(pos.uuid, msg, ref))
             log = POSLog()
             log.pos = pos
             if uid:
@@ -157,4 +163,4 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
             log.save()
         else:
             # Unknown action
-            self.send_error("Unknown action '{}'".format(action), pos)
+            self.send_error("Unknown action '{}'".format(action), ref, pos)
