@@ -144,7 +144,7 @@ class POSForm(GenModelForm):
                 _('Details'), 12,
                 ['name', 4],
                 ['key', 4],
-                ['zone', 6],
+                ['zone', 4],
                 ['hardware', 6],
             )
         ]
