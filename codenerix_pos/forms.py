@@ -227,6 +227,8 @@ class POSOperatorForm(GenModelForm):
         label=POSOperator.foreignkey_external()['label'],
         queryset=get_external_model(POSOperator).objects.all()
     )
+    password1 = forms.CharField(label=_("Password"), min_length=8, widget=forms.PasswordInput, required=True)
+    password2 = forms.CharField(label=_("Confirm password"), min_length=8, widget=forms.PasswordInput, required=True)
     
     class Meta:
         model = POSOperator
@@ -255,3 +257,11 @@ class POSOperatorForm(GenModelForm):
                 ['enable', 2],
             )
         ]
+
+    def clean(self):
+        cleaned_data = super(POSOperatorForm, self).clean()
+
+        if cleaned_data.get('password1') != cleaned_data.get('password2'):
+            del cleaned_data['password1']
+            del cleaned_data['password2']
+            raise forms.ValidationError(_("Passwords do not match"))
