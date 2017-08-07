@@ -22,8 +22,9 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 
 from codenerix.forms import GenModelForm
+from codenerix_extensions.helpers import get_external_model
 
-from .models import POSZone, POSHardware, POS, POSSlot, POSPlant, POSProduct
+from .models import POSZone, POSHardware, POS, POSSlot, POSPlant, POSProduct, POSOperator
 
 
 class POSPlantForm(GenModelForm):
@@ -219,3 +220,38 @@ class POSProductForm(GenModelForm):
             )
         ]
         return g
+
+
+class POSOperatorForm(GenModelForm):
+    codenerix_external_field = forms.ModelChoiceField(
+        label=POSOperator.foreignkey_external()['label'],
+        queryset=get_external_model(POSOperator).objects.all()
+    )
+    
+    class Meta:
+        model = POSOperator
+        exclude = []
+        autofill = {
+            'codenerix_external_field': ['select', 3, POSOperator.foreignkey_external()['related']],
+        }
+
+    def __groups__(self):
+        return [
+            (
+                _('Details'), 12,
+                ['codenerix_external_field', 6],
+                ['pos', 4],
+                ['enable', 2],
+            )
+        ]
+
+    @staticmethod
+    def __groups_details__():
+        return [
+            (
+                _('Details'), 12,
+                ['codenerix_external_field', 6],
+                ['pos', 4],
+                ['enable', 2],
+            )
+        ]

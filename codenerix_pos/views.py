@@ -25,9 +25,10 @@ from django.db.models import Q
 from django.utils.translation import ugettext as _
 
 from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUpdateModal, GenDelete, GenDetail, GenDetailModal
+from codenerix_extensions.views import GenCreateBridge, GenUpdateBridge
 
-from .models import POSZone, POSHardware, POS, POSSlot, POSPlant, POSProduct, POSLog
-from .forms import POSZoneForm, POSHardwareForm, POSForm, POSFormCreate, POSSlotForm, POSPlantForm, POSProductForm
+from .models import POSZone, POSHardware, POS, POSSlot, POSPlant, POSProduct, POSLog, POSOperator
+from .forms import POSZoneForm, POSHardwareForm, POSForm, POSFormCreate, POSSlotForm, POSPlantForm, POSProductForm, POSOperatorForm
 
 
 # ###########################################
@@ -308,3 +309,77 @@ class POSLogList(GenList):
     linkadd = False
     linkedit = False
     search_filter_button = True
+
+
+# ###########################################
+# POSOperator
+class POSOperatorList(GenList):
+    model = POSOperator
+    extra_context = {'menu': ['people', 'POSOperator'], 'bread': [_('People'), _('POSOperator')]}
+
+
+class POSOperatorCreate(GenCreate, GenCreateBridge):
+    model = POSOperator
+    form_class = POSOperatorForm
+
+    def form_valid(self, form):
+        field = 'codenerix_external_field'
+        model = POSOperator
+        related_field = 'pos_operator'
+        error_message = [
+            _("The selected entry is already a operator, select another entry!"),
+            _("The selected entry is not available anymore, please, try again!")
+        ]
+        return self.form_valid_bridge(form, field, model, related_field, error_message)
+
+
+class POSOperatorCreateModal(GenCreateModal, POSOperatorCreate):
+    pass
+
+
+class POSOperatorUpdate(GenUpdate, GenUpdateBridge):
+    model = POSOperator
+    form_class = POSOperatorForm
+
+    def get_form(self, form_class=None):
+        form = super(POSOperatorUpdate, self).get_form(form_class)
+        # initial external field
+        form.fields['codenerix_external_field'].initial = form.instance.external
+        return form
+
+    def form_valid(self, form):
+        field = 'codenerix_external_field'
+        model = POSOperator
+        related_field = 'pos_operator'
+        error_message = [
+            _("The selected entry is not available anymore, please, try again!")
+        ]
+        return self.form_valid_bridge(form, field, model, related_field, error_message)
+
+
+class POSOperatorUpdateModal(GenUpdateModal, POSOperatorUpdate):
+    pass
+
+
+class POSOperatorDelete(GenDelete):
+    model = POSOperator
+
+
+class POSOperatorSubList(GenList):
+    model = POSOperator
+    extra_context = {'menu': ['people', 'POSOperator'], 'bread': [_('People'), _('POSOperator')]}
+
+    def __limitQ__(self, info):
+        limit = {}
+        pk = info.kwargs.get('pk', None)
+        limit['link'] = Q(person__pk=pk)
+        return limit
+
+
+class POSOperatorDetails(GenDetail):
+    model = POSOperator
+    groups = POSOperatorForm.__groups_details__()
+
+
+class POSOperatorDetailModal(GenDetailModal, POSOperatorDetails):
+    pass

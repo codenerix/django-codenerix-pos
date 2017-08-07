@@ -38,6 +38,12 @@ from codenerix_products.models import ProductFinal
 from codenerix_invoicing.models import BillingSeries
 from codenerix_extensions.lib.cryptography import AESCipher
 
+from codenerix.models import GenInterface
+from codenerix.models_people import GenRole
+from codenerix_extensions.helpers import get_external_method
+from codenerix_pos.settings import CDNX_POS_PERMISSIONS
+
+
 """
 Plant
     Zones
@@ -339,3 +345,62 @@ class POSLog(CodenerixModel):
         tf['pos'] = (_('POS'), lambda x: Q(pos__pk=x), poss)
         tf['poshw'] = (_('Hardware'), lambda x: Q(poshw__pk=x), poshws)
         return tf
+
+
+# ############################
+class ABSTRACT_GenPOSOperator(models.Model):  # META: Abstract class
+
+    class Meta(object):
+        abstract = True
+
+
+class POSOperator(GenRole, CodenerixModel):
+    class CodenerixMeta:
+        abstract = ABSTRACT_GenPOSOperator
+        rol_groups = {
+            'POSOperator': CDNX_POS_PERMISSIONS['operator'],
+        }
+        rol_permissions = [
+        ]
+
+        force_methods = {
+            'foreignkey_posoperator': ('CDNX_get_fk_info_posoperator', _('---')),
+        }
+    
+    pos = models.ForeignKey(POS, related_name='pos_operators', verbose_name=_('POS'))
+    enable = models.BooleanField(_("Enable"), blank=False, null=False, default=True)
+
+    @staticmethod
+    def foreignkey_external():
+        return get_external_method(POSOperator, POSOperator.CodenerixMeta.force_methods['foreignkey_posoperator'][0])
+
+    def __unicode__(self):
+        return u"{}".format(smart_text(self.pk))
+
+    def __str__(self):
+        return self.__unicode__()
+
+    def __fields__(self, info):
+        fields = []
+        fields.append(('pos', _("POS")))
+        fields.append(('enable', _("Enable")))
+        fields = get_external_method(POSOperator, '__fields_posoperator__', info, fields)
+        return fields
+
+
+# operators
+class GenPOSOperator(GenInterface, ABSTRACT_GenPOSOperator):  # META: Abstract class
+    pos_operator = models.OneToOneField(POSOperator, related_name='external', verbose_name=_("POS Operator"), null=True, on_delete=models.SET_NULL, blank=True)
+
+    class Meta(GenInterface.Meta, ABSTRACT_GenPOSOperator.Meta):
+        abstract = True
+
+    @classmethod
+    def permissions(cls):
+        group = 'POSOperator'
+        perms = []
+        print(cls.posoperator.field.related_model)
+
+        return None
+
+        # print({group: {'gperm': None, 'dperm': perms, 'model': None},})

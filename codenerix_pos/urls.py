@@ -28,6 +28,7 @@ from .views import POSSlotList, POSSlotCreate, POSSlotCreateModal, POSSlotUpdate
 from .views import POSPlantList, POSPlantCreate, POSPlantCreateModal, POSPlantUpdate, POSPlantUpdateModal, POSPlantDelete, POSPlantDetails
 from .views import POSProductList, POSProductCreate, POSProductCreateModal, POSProductUpdate, POSProductUpdateModal, POSProductDelete, POSProductSubList, POSProductDetails, POSProductDetailModal
 from .views import POSLogList
+from .views import POSOperatorList, POSOperatorCreate, POSOperatorCreateModal, POSOperatorUpdate, POSOperatorUpdateModal, POSOperatorDelete, POSOperatorSubList, POSOperatorDetails, POSOperatorDetailModal
 
 urlpatterns = [
     url(r'^example$', TemplateView.as_view(template_name='codenerix_pos/example.html'), name='CDNX_pos_example'),
@@ -114,4 +115,20 @@ urlpatterns = [
     url(r'^posproducts/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/delete$', POSProductDelete.as_view(), name='CDNX_posproducts_sublist_delete'),
 
     url(r'^poslogs$', POSLogList.as_view(), name='CDNX_poslogs_list'),
+
+    url(r'^posoperators$', POSOperatorList.as_view(), name='CDNX_posoperators_list'),
+    url(r'^posoperators/add$', POSOperatorCreate.as_view(), name='CDNX_posoperators_add'),
+    url(r'^posoperators/addmodal$', POSOperatorCreateModal.as_view(), name='CDNX_posoperators_addmodal'),
+    url(r'^posoperators/(?P<pk>\w+)$', POSOperatorDetails.as_view(), name='CDNX_posoperators_details'),
+    url(r'^posoperators/(?P<pk>\w+)/edit$', POSOperatorUpdate.as_view(), name='CDNX_posoperators_edit'),
+    url(r'^posoperators/(?P<pk>\w+)/editmodal$', POSOperatorUpdateModal.as_view(), name='CDNX_posoperators_editmodal'),
+    url(r'^posoperators/(?P<pk>\w+)/delete$', POSOperatorDelete.as_view(), name='CDNX_posoperators_delete'),
+    url(r'^posoperators/(?P<pk>\w+)/sublist$', POSOperatorSubList.as_view(), name='CDNX_posoperators_sublist'),
+    url(r'^posoperators/(?P<pk>\w+)/sublist/add$', POSOperatorCreateModal.as_view(), name='CDNX_posoperators_sublist_add'),
+    url(r'^posoperators/(?P<pk>\w+)/sublist/addmodal$', POSOperatorCreateModal.as_view(), name='CDNX_posoperators_sublist_addmodal'),
+    url(r'^posoperators/(?P<cpk>\w+)/sublist/(?P<pk>\w+)$', POSOperatorDetailModal.as_view(), name='CDNX_posoperators_sublist_details'),
+    url(r'^posoperators/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/edit$', POSOperatorUpdateModal.as_view(), name='CDNX_posoperators_sublist_edit'),
+    url(r'^posoperators/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/editmodal$', POSOperatorUpdateModal.as_view(), name='CDNX_posoperators_sublist_editmodal'),
+    url(r'^posoperators/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/delete$', POSOperatorDelete.as_view(), name='CDNX_posoperators_sublist_delete'),
+
 ]
