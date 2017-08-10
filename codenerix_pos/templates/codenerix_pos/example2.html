@@ -1,0 +1,16 @@
+CODENERIX POS example websocket localhost
+<script type="text/javascript" src="/static/codenerix/lib/jquery/jquery.js"></script>  
+<script type="text/javascript" src="/static/codenerix_pos/lib/reconnecting-websocket/reconnecting-websocket.js"></script>  
+<script type="text/javascript">
+$(function() {
+    // When we're using HTTPS, use WSS too.
+    var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+    var ws_path = ws_scheme + '://127.0.0.1:8080/codenerix_pos_client/';
+    console.log("Connecting to " + ws_path)
+    var socket = new ReconnectingWebSocket(ws_path);
+    socket.onmessage = function(message) {
+        console.log("Got message: " + message.data);
+        socket.close();
+    };
+});
+</script>
