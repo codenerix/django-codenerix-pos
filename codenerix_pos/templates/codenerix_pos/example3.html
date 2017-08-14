@@ -1,0 +1,32 @@
+CODENERIX POS example websocket
+<script type="text/javascript" src="/static/codenerix/lib/jquery/jquery.js"></script>  
+
+<script type="text/javascript" src="/static/codenerix_extensions/lib/crypto-js/core.js"></script>  
+<script type="text/javascript" src="/static/codenerix_extensions/lib/crypto-js/sha256.js"></script>  
+<script type="text/javascript" src="/static/codenerix_extensions/lib/crypto-js/enc-base64.js"></script>  
+<script type="text/javascript" src="/static/codenerix_extensions/lib/crypto-js/cipher-core.js"></script>  
+<script type="text/javascript" src="/static/codenerix_extensions/lib/crypto-js/aes.js"></script>  
+
+<script type="text/javascript" src="/static/codenerix_extensions/js/cryptography.js"></script>  
+
+<script type="text/javascript">
+
+$(function() {
+
+    // Config
+    var raw = "1234567890123456";
+    var key = "1234567890123456";
+    var raw2 = "eFu34cdc2j30avHkYRIIfoH0JpD2VgkuMIkULxKxvuqwEPt26h33KHzqmnEIPbaX";
+    var key2 = "123456789012345b";
+    var raw3 = "hOxLY8VLpi989zsRJZycBZgij2iPM/jYkdq51m3yFy+n/gMGL5Z5YjxcUhitJ81tEcKnz55cTenBaTG0uUcZfqhjQne42LaVWykItm1J/aA=";
+    var key3 = "La magia ocurre cuando sale el sol";
+    var raw4 = "When the moon comes to the sky, your eyes shine!";
+    var key4 = "No matter what you do, the sierpinski cube is beautifull!"
+
+    var enc = encrypt(raw, key, "1234567890123456"); console.log(typeof(enc), enc);
+    var dec = decrypt(raw2, key2); console.log(typeof(dec), dec);
+    var dec = decrypt(raw3, key3); console.log(typeof(dec), dec);
+    var enc = encrypt(raw4, key4); console.log(typeof(enc), enc);
+
+});
+</script>

@@ -33,6 +33,7 @@ from .views import POSOperatorList, POSOperatorCreate, POSOperatorCreateModal, P
 urlpatterns = [
     url(r'^example$', TemplateView.as_view(template_name='codenerix_pos/example.html'), name='CDNX_pos_example'),
     url(r'^example2$', TemplateView.as_view(template_name='codenerix_pos/example2.html'), name='CDNX_pos_example2'),
+    url(r'^example3$', TemplateView.as_view(template_name='codenerix_pos/example3.html'), name='CDNX_pos_example3'),
 
     url(r'^posplants$', POSPlantList.as_view(), name='CDNX_posplants_list'),
     url(r'^posplants/add$', POSPlantCreate.as_view(), name='CDNX_posplants_add'),
