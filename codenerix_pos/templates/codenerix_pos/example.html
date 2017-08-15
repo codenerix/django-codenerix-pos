@@ -1,33 +1,54 @@
 CODENERIX POS example websocket
 <script type="text/javascript" src="/static/codenerix/lib/jquery/jquery.js"></script>  
+
+<script type="text/javascript" src="/static/codenerix_extensions/lib/crypto-js/core.js"></script>  
+<script type="text/javascript" src="/static/codenerix_extensions/lib/crypto-js/sha256.js"></script>  
+<script type="text/javascript" src="/static/codenerix_extensions/lib/crypto-js/enc-base64.js"></script>  
+<script type="text/javascript" src="/static/codenerix_extensions/lib/crypto-js/cipher-core.js"></script>  
+<script type="text/javascript" src="/static/codenerix_extensions/lib/crypto-js/aes.js"></script>  
+<script type="text/javascript" src="/static/codenerix_extensions/js/cryptography.js"></script>  
+
 <script type="text/javascript" src="/static/codenerix_pos/lib/reconnecting-websocket/reconnecting-websocket.js"></script>  
+<script type="text/javascript" src="/static/codenerix_pos/js/websocket.js"></script>  
+
 <script type="text/javascript">
 $(function() {
-    // When we're using HTTPS, use WSS too.
-    var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-    var ws_path = ws_scheme + '://' + window.location.host + '/dashboard/';
-    var ws_path = ws_scheme + '://127.0.0.1:8000/codenerix_pos/';
-    console.log("Connecting to " + ws_path)
-    var socket = new ReconnectingWebSocket(ws_path);
-    socket.onmessage = function(message) {
-        console.log("Got message: " + message.data);
-        
-        // Read message
-        var answer=JSON.parse(message.data);
-        
-        var token='EURECzbRe8mh7JTAfA';
-        
-        console.log("Connected -> Start");
-        var packet={
-            'action': 'authenticate',
-            'id': 'C3PO',
-            'token': token,
-        };
-        socket.send(JSON.stringify(packet));
-        if (answer.action=='reply_channel') {
-               socket.send(JSON.stringify({'action':"start_sec3",'job_id':'xxx'}));
-        }
-        // var data = JSON.parse({'action':"start_sec3",'job_id':'xxx'});
+    
+    var ws = new CodenerixPOSWebsocket(
+            "127.0.0.1:8000",
+            "codenerix_pos/",
+            "11111111-2222-3333-4444-555555555555",
+            "12345678901234567890123456789012",
+            );
+
+    // Prepare debugger
+    ws.set_name("ws_ex3")
+    ws.set_debug();
+
+    // Define opener
+    ws.opened = function () {
+        ws.debug("Requesting config");
+        ws.send({'action': 'get_config'}, null);
     };
+
+    // Define receiver
+    ws.recv = function(message, ref) {
+
+        ws.debug("Got message: " + JSON.stringify(message) + " (REF: "+ref+")");
+        var action = message.action;
+
+        if (action == 'ping') {
+            ws.debug("Sending PONG "+message.ref+" (ref:"+ref+")");
+            ws.send({'action': 'pong'}, ref);
+        } else if (action == 'config') {
+            ws.warning("Got config: "+JSON.stringify(message)+" (ref:"+ref+")");
+        } else {
+            ws.send_error("Unknown action '"+action+"'", ref);
+        }
+
+    };
+
+    // Start websocket
+    ws.start();
 });
 </script>
