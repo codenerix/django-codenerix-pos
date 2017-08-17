@@ -69,13 +69,19 @@ Hardware (ticket, dni, caja, dispositivo de firma, dispositivo de consulta)
 
 # Changing this KEYS will affect to any client beacuse it is used for communication as a standard
 KIND_POSHARDWARE_TICKET = "TICKET"
+KIND_POSHARDWARE_DNIE = "DNIE"
+KIND_POSHARDWARE_CASH = "CASH"
+KIND_POSHARDWARE_WEIGHT = "WEIGHT"
+KIND_POSHARDWARE_SIGN = "SIGN"
+KIND_POSHARDWARE_QUERY = "QUERY"
+
 KIND_POSHARDWARE = (
     (KIND_POSHARDWARE_TICKET, _("Ticket printer")),
-    ("DNIE", _("DNIe card reader")),
-    ("CASH", _("Cash drawer")),
-    ("WEIGHT", _("Weight")),
-    ("SIGN", _("Signature pad")),
-    ("QUERY", _("Query service (Ex: Barcode)")),  # Barcode reader, Point of Information for clients, etc...
+    (KIND_POSHARDWARE_DNIE, _("DNIe card reader")),
+    (KIND_POSHARDWARE_CASH, _("Cash drawer")),
+    (KIND_POSHARDWARE_WEIGHT, _("Weight")),
+    (KIND_POSHARDWARE_SIGN, _("Signature pad")),
+    (KIND_POSHARDWARE_QUERY, _("Query service (Ex: Barcode)")),  # Barcode reader, Point of Information for clients, etc...
 )
 
 
@@ -215,6 +221,9 @@ class POS(CodenerixModel):
         fields.append(('channel', _("Channel")))
         fields.append(('hardware', _("Hardware")))
         return fields
+
+    def have_cash_drawer(self):
+        return self.hardwares.filter(kind=KIND_POSHARDWARE_CASH).exists()
 
     def save(self, *args, **kwargs):
         if 'doreset' in kwargs:
