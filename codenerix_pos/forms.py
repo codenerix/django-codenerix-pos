@@ -227,8 +227,8 @@ class POSOperatorForm(GenModelForm):
         label=POSOperator.foreignkey_external()['label'],
         queryset=get_external_model(POSOperator).objects.all()
     )
-    password1 = forms.CharField(label=_("Password"), min_length=8, widget=forms.PasswordInput, required=True)
-    password2 = forms.CharField(label=_("Confirm password"), min_length=8, widget=forms.PasswordInput, required=True)
+    password1 = forms.CharField(label=_("Pin for vending"), min_length=8, widget=forms.PasswordInput, required=True)
+    password2 = forms.CharField(label=_("Confirm pin"), min_length=8, widget=forms.PasswordInput, required=True)
     
     class Meta:
         model = POSOperator
@@ -244,6 +244,8 @@ class POSOperatorForm(GenModelForm):
                 ['codenerix_external_field', 6],
                 ['pos', 4],
                 ['enable', 2],
+                ['password1', 6],
+                ['password2', 6],
             )
         ]
 
