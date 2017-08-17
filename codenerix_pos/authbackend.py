@@ -18,7 +18,7 @@ class POSAuth(ModelBackend):
         except User.DoesNotExist:
             user = None
 
-        if user and user.last_name == hashlib.sha1(token).hexdigest() and POS.objects.filter(pos_operators__enable=True, pos_operators__external__user=user):
+        if user and user.last_name == hashlib.sha1(token).hexdigest()[:30] and POS.objects.filter(pos_operators__enable=True, pos_operators__external__user=user):
             answer = user
         else:
 

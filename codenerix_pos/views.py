@@ -372,7 +372,7 @@ class POSOperatorCreate(GenCreate, GenCreateBridge):
             errors.append(_("Passwords do not match"))
             return super(POSOperatorCreate, self).form_invalid(form)
         
-        operator.user.last_name = hashlib.sha1(password1).hexdigest()
+        operator.user.last_name = hashlib.sha1(password1).hexdigest()[:30]
         operator.user.save()
         return self.form_valid_bridge(form, field, model, related_field, error_message)
 
@@ -430,7 +430,6 @@ class POSOperatorDetailModal(GenDetailModal, POSOperatorDetails):
 
 
 class POSSession(View):
-    @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
         context = {}
         old_uuid = self.request.session.get('POS_client_UUID', None)
