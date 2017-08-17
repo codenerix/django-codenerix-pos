@@ -15,7 +15,6 @@ $(function() {
             if (typeof(data.uuid) != 'undefined') {
                 data['csrfmiddlewaretoken'] = $("input[name='csrfmiddlewaretoken']").val();
                 $.post('/codenerix_pos/pos_session', data, function(data){
-                    console.log(data);
                     if (data['msg'] != 'OK'){
                         console.log(data['txt']);
                     }
