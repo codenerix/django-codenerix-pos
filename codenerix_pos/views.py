@@ -18,14 +18,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import hashlib
 import random
 import string
 
 from django.db.models import Q
 from django.db.models.fields import FieldDoesNotExist
+from django.contrib.auth.decorators import login_required
 from django.forms.utils import ErrorList
+from django.http import HttpResponse
+from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
+from django.views.generic import View
 
 from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUpdateModal, GenDelete, GenDetail, GenDetailModal
 from codenerix_extensions.views import GenCreateBridge, GenUpdateBridge
@@ -422,3 +427,21 @@ class POSOperatorDetails(GenDetail):
 
 class POSOperatorDetailModal(GenDetailModal, POSOperatorDetails):
     pass
+
+
+class POSSession(View):
+    @method_decorator(login_required)
+    def post(self, request, *args, **kwargs):
+        context = {}
+        old_uuid = self.request.session.get('POS_client_UUID', None)
+        new_uuid = request.POST.get('uuid', None)
+
+        if old_uuid and new_uuid and old_uuid != new_uuid:
+            context['msg'] = 'KO'
+            context['txt'] = 'UUID changed. {} => {}'.format(old_uuid, new_uuid)
+        else:
+            context['msg'] = 'OK'
+            
+        self.request.session['POS_client_UUID'] = new_uuid
+        json_answer = json.dumps(context)
+        return HttpResponse(json_answer, content_type='application/json')
