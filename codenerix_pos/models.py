@@ -179,11 +179,11 @@ class POSHardware(CodenerixModel):
             SIGN:   --- NOT ALLOWED / NOT AVAILABLE ---
             QUERY:  --- NOT ALLOWED / NOT AVAILABLE ---
         '''
-        if self.kind == 'TICKET':
+        if self.kind in ['TICKET', 'SIGN']:
             if msg is not None:
                 data = msg
             else:
-                raise IOError("Nothing to print???")
+                raise IOError("Nothing to say to the remote endpoint???")
         elif self.kind in ['CASH', 'DNIE', 'WEIGHT']:
             data = 'DOIT'
         else:
