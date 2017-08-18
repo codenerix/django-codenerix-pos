@@ -143,6 +143,7 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
                         # Suscribe this websocket to group
                         self.debug("Subscribed to '{}'".format(uid.hex), color="purple")
                         Group(uid.hex).add(self.message.reply_channel)
+                        self.send({'action': 'subscribed', 'uuid':uid.hex, 'key': poshw.key}, ref, pos)
                     else:
                         self.send_error("You cannot subscribe to a disabled Hardware!", ref, pos)
                 else:

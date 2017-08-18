@@ -10,6 +10,7 @@ function CodenerixPOSWebsocket(url, path, uuid, key) {
     self.encrypt = false;
     self.uuid = uuid;
     self.key = key;
+    self.keyb = {};
 
     // Set debugger system
     self.set_name = function (name) {
@@ -143,10 +144,18 @@ function CodenerixPOSWebsocket(url, path, uuid, key) {
             if (typeof(message) == 'undefined') {
                 self.send_error("Missing 'message'");
             } else if (message != null) {
+                
+                // Check if this is a broadcast message
+                if (typeof(request.broadcast) == 'undefined') {
+                    key = self.key;
+                } else {
+                    self.debug("Broadcast message with UUID '"+request.broadcast+"' and key '"+self.keyb[request.broadcast]+"'");
+                    key = self.keyb[request.broadcast];
+                }
 
                 // Decrypt the message
                 try {
-                    msg = decrypt(message, self.key);
+                    msg = decrypt(message, key);
                     if (msg.length>0) {
                         self.encrypt = true;
                     } else {
@@ -170,7 +179,15 @@ function CodenerixPOSWebsocket(url, path, uuid, key) {
                             if (typeof(request) == 'object') {
                                 self.debug("Receive: "+JSON.stringify(request));
                                 if (typeof(self.recv)!='undefined') {
-                                    self.recv(request, ref);
+                                    if (request.action == 'subscribed') {
+                                        self.keyb[request.uuid] = request.key;
+                                    } else {
+                                        if (typeof(request.broadcast) == 'undefined') {
+                                            self.recv(request, ref, self.uuid);
+                                        } else {
+                                            self.recv(request, ref, request.broadcast);
+                                        }
+                                    }
                                 } else {
                                     console.error("No 'recv' method found, I can not do anything with this request!");
                                 }

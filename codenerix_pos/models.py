@@ -134,6 +134,7 @@ class POSHardware(CodenerixModel):
     name = models.CharField(_("Name"), max_length=250, blank=False, null=False, unique=True)
     enable = models.BooleanField(_('Enable'), default=True)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    key = models.CharField(_("Key"), max_length=32, blank=False, null=False, unique=True)
     config = JSONField(_("config"), blank=True, null=True)
     value = JSONField(_("config"), blank=True, null=True)
 
@@ -150,6 +151,7 @@ class POSHardware(CodenerixModel):
         fields.append(('name', _("Name")))
         fields.append(('enable', _("Enable")))
         fields.append(('uuid', _("UUID")))
+        fields.append(('key', _("Key")))
         fields.append(('config', _("Config")))
         fields.append(('value', _("Value")))
         return fields
@@ -170,8 +172,13 @@ class POSHardware(CodenerixModel):
         self.value = msg
         self.save(doreset=False)
 
+        # Define final message to all groups
+        finalmsg = {}
+        finalmsg['action'] = 'subscription'
+        finalmsg['data'] = msg
+
         # Notify all groups about this message
-        data = self.pos.build_msg(msg, broadcast=True)
+        data = self.pos.build_msg(finalmsg, broadcast=self.uuid.hex, key=self.key)
         Group(self.uuid.hex).send({'text': data})
 
     def send(self, msg=None, ref=None):
@@ -202,7 +209,6 @@ class POS(CodenerixModel):
     name = models.CharField(_("Name"), max_length=250, blank=False, null=False, unique=True)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     key = models.CharField(_("Key"), max_length=32, blank=False, null=False, unique=True)
-    keyb = models.CharField(_("Key Broadcast"), max_length=32, blank=False, null=False, unique=True)
     zone = models.ForeignKey(POSZone, related_name='poss', verbose_name=_("Zone"))
     payments = models.ManyToManyField(PaymentRequest, related_name='poss', verbose_name=_("Payments"), blank=True)
     channel = models.CharField(_("Channel"), max_length=50, blank=True, null=True, unique=True, editable=False)
@@ -221,7 +227,6 @@ class POS(CodenerixModel):
         fields.append(('name', _("Name")))
         fields.append(('uuid', _("UUID")))
         fields.append(('key', _("Key")))
-        fields.append(('keyb', _("Key Broadcast")))
         fields.append(('channel', _("Channel")))
         fields.append(('hardware', _("Hardware")))
         return fields
@@ -251,7 +256,7 @@ class POS(CodenerixModel):
         self.send({'action': 'ping', 'ref': ref, 'uuid': uidtxt})
         return ref
 
-    def build_msg(self, data, ref=None, uid=None, broadcast=False):
+    def build_msg(self, data, ref=None, uid=None, broadcast=None, key=None):
 
         if uid:
             # Message for some client
@@ -267,10 +272,8 @@ class POS(CodenerixModel):
             message = data
 
         # Choose key
-        if not broadcast:
+        if broadcast is None or key is None:
             key = self.key
-        else:
-            key = self.keyb
 
         # Send message
         crypto = AESCipher()
@@ -278,16 +281,16 @@ class POS(CodenerixModel):
         request = crypto.encrypt(msg, key).decode('utf-8')
         struct = {'message': request}
         if broadcast:
-            struct = {'broadcast': self.uuid}
+            struct['broadcast'] = broadcast
         data = json.dumps(struct)
 
         # Return result
         return data
 
-    def send(self, data, ref=None, uid=None, broadcast=False):
+    def send(self, data, ref=None, uid=None, broadcast=None, key=None):
 
         if self.channel:
-            data = self.build_msg(data, ref, uid, broadcast)
+            data = self.build_msg(data, ref, uid, broadcast, key)
             Channel(self.channel).send({'text': data})
         else:
             raise IOError("No channel available for this POS")
