@@ -176,18 +176,15 @@ class POSHardware(CodenerixModel):
             CASH:   {'data': '...ANYTHING except None to open the Cash Drawer...' }
             DNIE:   {'data': '...ANYTHING except None to get again data from DNIe if connected...' }
             WEIGHT: {'data': '...ANYTHING except None to get the value of the last wegith' }
-            SIGN:   --- NOT ALLOWED / NOT AVAILABLE ---
-            QUERY:  --- NOT ALLOWED / NOT AVAILABLE ---
+            OTHERS: {'data': '...ANYTHING you need to communicate to the device'}
         '''
-        if self.kind in ['TICKET', 'SIGN']:
+        if self.kind in ['CASH', 'DNIE', 'WEIGHT']:
+            data = 'DOIT'
+        else:
             if msg is not None:
                 data = msg
             else:
                 raise IOError("Nothing to say to the remote endpoint???")
-        elif self.kind in ['CASH', 'DNIE', 'WEIGHT']:
-            data = 'DOIT'
-        else:
-            raise IOError("This Hardware can not send data anywhere")
 
         # Say it to send this message
         self.pos.send(data, ref, self.uuid)
