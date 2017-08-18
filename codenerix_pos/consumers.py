@@ -1,6 +1,7 @@
 import json
 import uuid
 
+from channels import Group
 from channels.generic.websockets import JsonWebsocketConsumer
 
 from codenerix.lib.debugger import Debugger
@@ -18,6 +19,9 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
 
         # Cryptography
         self.crypto = AESCipher()
+
+        # Set internal UUID
+        self.uuid = None
 
         # Let it keep going normal
         super(POSConsumer, self).__init__(*args, **kwargs)
@@ -127,6 +131,24 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
                 answer['hardware'].append({'kind': hw.kind, 'config': hw.config, 'uuid': hw.uuid.hex})
             self.debug("{} - Send: {}".format(pos, answer), color='green')
             self.send(answer, ref, pos)
+        elif action == 'subscribe':
+            # Get UUID
+            uid = message.get('uuid', None)
+            # Check if we got a valid UUID
+            if uid:
+                uid = uuid.UUID(uid)
+                poshw = POSHardware.objects.filter(uuid=uid).first()
+                if poshw:
+                    if poshw.enable:
+                        # Suscribe this websocket to group
+                        self.debug("Subscribed to '{}'".format(uid.hex), color="purple")
+                        Group(uid.hex).add(self.message.reply_channel)
+                    else:
+                        self.send_error("You cannot subscribe to a disabled Hardware!", ref, pos)
+                else:
+                    self.send_error("You cannot subscribe to a Hardware that is not available, UUID not found!", ref, pos)
+            else:
+                self.send_error("You have tried to subscribe to a UUID but didn't specify any or is invalid", ref, pos)
         elif action == 'msg':
             uid = message.get('uuid', None)
             msg = message.get('msg', None)

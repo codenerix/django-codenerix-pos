@@ -21,7 +21,7 @@
 import json
 import uuid
 import hashlib
-from channels import Channel
+from channels import Channel, Group
 
 from django.db import models
 from django.utils.encoding import smart_text
@@ -166,8 +166,13 @@ class POSHardware(CodenerixModel):
         return result
 
     def recv(self, msg):
+        # Save result in database
         self.value = msg
         self.save(doreset=False)
+
+        # Notify all groups about this message
+        data = self.pos.build_msg(msg, broadcast=True)
+        Group(self.uuid.hex).send({'text': data})
 
     def send(self, msg=None, ref=None):
         '''
@@ -197,11 +202,12 @@ class POS(CodenerixModel):
     name = models.CharField(_("Name"), max_length=250, blank=False, null=False, unique=True)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     key = models.CharField(_("Key"), max_length=32, blank=False, null=False, unique=True)
+    keyb = models.CharField(_("Key Broadcast"), max_length=32, blank=False, null=False, unique=True)
     zone = models.ForeignKey(POSZone, related_name='poss', verbose_name=_("Zone"))
-    payments = models.ManyToManyField(PaymentRequest, related_name='poss', verbose_name=_("Payments"), blank=True, null=True)
+    payments = models.ManyToManyField(PaymentRequest, related_name='poss', verbose_name=_("Payments"), blank=True)
     channel = models.CharField(_("Channel"), max_length=50, blank=True, null=True, unique=True, editable=False)
     # Hardware that can use
-    hardware = models.ManyToManyField(POSHardware, related_name='poss', verbose_name=_("Hardware it can use"), blank=True, null=True)
+    hardware = models.ManyToManyField(POSHardware, related_name='poss', verbose_name=_("Hardware it can use"), blank=True)
 
     def __unicode__(self):
         return self.__str__()
@@ -215,6 +221,7 @@ class POS(CodenerixModel):
         fields.append(('name', _("Name")))
         fields.append(('uuid', _("UUID")))
         fields.append(('key', _("Key")))
+        fields.append(('keyb', _("Key Broadcast")))
         fields.append(('channel', _("Channel")))
         fields.append(('hardware', _("Hardware")))
         return fields
@@ -244,27 +251,43 @@ class POS(CodenerixModel):
         self.send({'action': 'ping', 'ref': ref, 'uuid': uidtxt})
         return ref
 
-    def send(self, data, ref=None, uid=None):
+    def build_msg(self, data, ref=None, uid=None, broadcast=False):
+
+        if uid:
+            # Message for some client
+            message = {
+                'action': 'msg',
+                'message': {
+                    'data': data,
+                },
+                'uuid': uid.hex,
+            }
+        else:
+            # Message for the server
+            message = data
+
+        # Choose key
+        if not broadcast:
+            key = self.key
+        else:
+            key = self.keyb
+
+        # Send message
+        crypto = AESCipher()
+        msg = json.dumps({'request': message, 'ref': ref})
+        request = crypto.encrypt(msg, key).decode('utf-8')
+        struct = {'message': request}
+        if broadcast:
+            struct = {'broadcast': self.uuid}
+        data = json.dumps(struct)
+
+        # Return result
+        return data
+
+    def send(self, data, ref=None, uid=None, broadcast=False):
 
         if self.channel:
-            if uid:
-                # Message for some client
-                message = {
-                    'action': 'msg',
-                    'message': {
-                        'data': data,
-                    },
-                    'uuid': uid.hex,
-                }
-            else:
-                # Message for the server
-                message = data
-
-            # Send message
-            crypto = AESCipher()
-            msg = json.dumps({'request': message, 'ref': ref})
-            request = crypto.encrypt(msg, self.key).decode('utf-8')
-            data = json.dumps({'message': request})
+            data = self.build_msg(data, ref, uid, broadcast)
             Channel(self.channel).send({'text': data})
         else:
             raise IOError("No channel available for this POS")
@@ -406,8 +429,8 @@ class GenPOSOperator(GenInterface, ABSTRACT_GenPOSOperator):  # META: Abstract c
 
     @classmethod
     def permissions(cls):
-        group = 'POSOperator'
-        perms = []
+        # group = 'POSOperator'
+        # perms = []
         print(cls.posoperator.field.related_model)
 
         return None
