@@ -249,25 +249,28 @@ class POS(CodenerixModel):
 
     def send(self, data, ref=None, uid=None):
 
-        if uid:
-            # Message for some client
-            message = {
-                'action': 'msg',
-                'message': {
-                    'data': data,
-                },
-                'uuid': uid.hex,
-            }
-        else:
-            # Message for the server
-            message = data
+        if self.channel:
+            if uid:
+                # Message for some client
+                message = {
+                    'action': 'msg',
+                    'message': {
+                        'data': data,
+                    },
+                    'uuid': uid.hex,
+                }
+            else:
+                # Message for the server
+                message = data
 
-        # Send message
-        crypto = AESCipher()
-        msg = json.dumps({'request': message, 'ref': ref})
-        request = crypto.encrypt(msg, self.key).decode('utf-8')
-        data = json.dumps({'message': request})
-        Channel(self.channel).send({'text': data})
+            # Send message
+            crypto = AESCipher()
+            msg = json.dumps({'request': message, 'ref': ref})
+            request = crypto.encrypt(msg, self.key).decode('utf-8')
+            data = json.dumps({'message': request})
+            Channel(self.channel).send({'text': data})
+        else:
+            raise IOError("No channel available for this POS")
 
 
 class POSSlot(CodenerixModel):
@@ -375,7 +378,7 @@ class POSOperator(GenRole, CodenerixModel):
         force_methods = {
             'foreignkey_posoperator': ('CDNX_get_fk_info_posoperator', _('---')),
         }
-    
+
     pos = models.ForeignKey(POS, related_name='pos_operators', verbose_name=_('POS'))
     enable = models.BooleanField(_("Enable"), blank=False, null=False, default=True)
 
