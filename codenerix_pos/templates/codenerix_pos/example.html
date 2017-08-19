@@ -8,13 +8,13 @@ CODENERIX POS example websocket
 <script type="text/javascript" src="/static/codenerix_extensions/lib/crypto-js/aes.js"></script>  
 <script type="text/javascript" src="/static/codenerix_extensions/js/cryptography.js"></script>  
 
-<script type="text/javascript" src="/static/codenerix_pos/lib/reconnecting-websocket/reconnecting-websocket.js"></script>  
-<script type="text/javascript" src="/static/codenerix_pos/js/websocket.js"></script>  
+<script type="text/javascript" src="/static/codenerix_extensions/lib/reconnecting-websocket/reconnecting-websocket.js"></script>  
+<script type="text/javascript" src="/static/codenerix_extensions/js/websocket.js"></script>  
 
 <script type="text/javascript">
 $(function() {
     
-    var ws = new CodenerixPOSWebsocket(
+    var ws = new CodenerixWebsocket(
             "127.0.0.1:8000",
             "codenerix_pos/",
             "11111111-2222-3333-4444-555555555555",
@@ -22,7 +22,7 @@ $(function() {
             );
 
     // Prepare debugger
-    ws.set_name("ws_ex3")
+    ws.set_name("POSWebSocket Example")
     ws.set_debug();
 
     // Define opener
