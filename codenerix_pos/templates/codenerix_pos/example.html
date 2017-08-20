@@ -15,7 +15,7 @@ CODENERIX POS example websocket
 $(function() {
     
     var ws = new CodenerixWebsocket(
-            "127.0.0.1:8000",
+            "{{url}}",
             "codenerix_pos/",
             "11111111-2222-3333-4444-555555555555",
             "12345678901234567890123456789012",
@@ -27,7 +27,8 @@ $(function() {
 
     // Define opener
     ws.opened = function () {
-        ws.debug("Requesting config");
+        ws.debug("WebSocket CONNECTED");
+        ws.debug("Requesting get_config to check authentication as well");
         ws.send({'action': 'get_config'}, null);
     };
 

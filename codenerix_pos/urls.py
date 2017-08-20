@@ -31,8 +31,19 @@ from .views import POSLogList
 from .views import POSOperatorList, POSOperatorCreate, POSOperatorCreateModal, POSOperatorUpdate, POSOperatorUpdateModal, POSOperatorDelete, POSOperatorSubList, POSOperatorDetails, POSOperatorDetailModal
 from .views import POSSession
 
+
+class ExampleView(TemplateView):
+
+    template_name = "codenerix_pos/example.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(ExampleView, self).get_context_data(**kwargs)
+        context['url'] = self.request.META.get("HTTP_HOST")
+        return context
+
+
 urlpatterns = [
-    url(r'^example$', TemplateView.as_view(template_name='codenerix_pos/example.html'), name='CDNX_pos_example'),
+    url(r'^example$', ExampleView.as_view(), name='CDNX_pos_example'),
 
     url(r'^posplants$', POSPlantList.as_view(), name='CDNX_posplants_list'),
     url(r'^posplants/add$', POSPlantCreate.as_view(), name='CDNX_posplants_add'),
