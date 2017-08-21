@@ -240,7 +240,7 @@ class POS(CodenerixModel):
         else:
             doreset = True
         result = super(POS, self).save(*args, **kwargs)
-        if doreset:
+        if self.channel and doreset:
             self.reset_client()
         return result
 

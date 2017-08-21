@@ -78,11 +78,18 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
 
                     if pos:
                         # Decrypt message
-                        msg = self.crypto.decrypt(message, pos.key)
+                        try:
+                            msg = self.crypto.decrypt(message, pos.key)
+                        except Exception:
+                            msg = None
+
                         try:
                             query = json.loads(msg)
                         except Exception:
-                            query = None
+                            query = {}
+
+                        if type(query) is not dict:
+                            query = {}
 
                         request = query.get('request', None)
                         if request is not None:
@@ -143,7 +150,7 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
                         # Suscribe this websocket to group
                         self.debug("Subscribed to '{}'".format(uid.hex), color="purple")
                         Group(uid.hex).add(self.message.reply_channel)
-                        self.send({'action': 'subscribed', 'uuid':uid.hex, 'key': poshw.key}, ref, pos)
+                        self.send({'action': 'subscribed', 'uuid': uid.hex, 'key': poshw.key}, ref, pos)
                     else:
                         self.send_error("You cannot subscribe to a disabled Hardware!", ref, pos)
                 else:
