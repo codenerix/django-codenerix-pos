@@ -1,3 +1,5 @@
+var uuid_websocket = undefined;
+var key_websocket = undefined;
 $(function() {
     // When we're using HTTPS, use WSS too.
     var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
@@ -13,6 +15,9 @@ $(function() {
                 var data = null;
             }
             if (typeof(data.uuid) != 'undefined') {
+                uuid_websocket = data.uuid;
+                key_websocket = data.key;
+                
                 data['csrfmiddlewaretoken'] = $("input[name='csrfmiddlewaretoken']").val();
                 $.post('/codenerix_pos/pos_session', data, function(data){
                     if (data['msg'] != 'OK'){
