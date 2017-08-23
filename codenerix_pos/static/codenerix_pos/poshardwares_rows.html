@@ -1,0 +1,11 @@
+<td ng-class='{"bg-warning": row.where>1}'>{{row.pos|codenerix}}</td>
+<td ng-class='{"bg-warning": row.where>1}'>{{row.get_kind_display|codenerix}}</td>
+<td ng-class='{"bg-warning": row.where>1}'>
+    {{row.name|codenerix}}
+    <span class='fa fa-exclamation-triangle text-danger' title='{{data.meta.gentranslate.warning_toomany}}' ng-if='row.where>1'></span>
+</td>
+<td ng-class='{"bg-warning": row.where>1}' ng-bind-html="row.enable|codenerix"></td>
+<td ng-class='{"bg-warning": row.where>1}'>{{row.uuid|codenerix}}</td>
+<td ng-class='{"bg-warning": row.where>1}'>{{row.key|codenerix}}</td>
+<td ng-class='{"bg-warning": row.where>1}'>{{row.config|codenerix}}</td>
+<td ng-class='{"bg-warning": row.where>1}'>{{row.value|codenerix}}</td>

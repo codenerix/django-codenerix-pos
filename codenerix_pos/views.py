@@ -25,18 +25,17 @@ import string
 
 from django.db.models import Q
 from django.db.models.fields import FieldDoesNotExist
-from django.contrib.auth.decorators import login_required
 from django.forms.utils import ErrorList
 from django.http import HttpResponse
-from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.generic import View
+from django.db.models import Count
 
 from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUpdateModal, GenDelete, GenDetail, GenDetailModal
 from codenerix_extensions.views import GenCreateBridge, GenUpdateBridge
 
 from .models import POSZone, POSHardware, POS, POSSlot, POSPlant, POSProduct, POSLog, POSOperator
-from .forms import POSZoneForm, POSHardwareForm, POSForm, POSFormCreate, POSSlotForm, POSPlantForm, POSProductForm, POSOperatorForm
+from .forms import POSZoneForm, POSHardwareForm, POSHardwareFormCreate, POSForm, POSFormCreate, POSSlotForm, POSPlantForm, POSProductForm, POSOperatorForm
 
 
 # ###########################################
@@ -112,11 +111,33 @@ class POSZoneDetails(GenDetail):
 class POSHardwareList(GenList):
     model = POSHardware
     extra_context = {'menu': ['pos', 'poshardware'], 'bread': [_('POS'), _('Hardware'), ]}
+    annotations = {
+        'where': Count('poss'),
+    }
+    gentrans = {'warning_toomany': _('Too many POSs are using this hardware!')}
+
+    def __fields__(self, info):
+        fields = []
+        fields.append(('pos', _("POS")))
+        fields.append(('get_kind_display', _("Kind")))
+        fields.append(('name', _("Name")))
+        fields.append(('enable', _("Enable")))
+        fields.append(('uuid', _("UUID")))
+        fields.append(('key', _("Key")))
+        fields.append(('config', _("Config")))
+        fields.append(('value', _("Value")))
+        fields.append(('where', None))
+        return fields
 
 
 class POSHardwareCreate(GenCreate):
     model = POSHardware
-    form_class = POSHardwareForm
+    form_class = POSHardwareFormCreate
+
+    def get_form(self, *args, **kwargs):
+        form = super(POSHardwareCreate, self).get_form(*args, **kwargs)
+        form.fields["key"].initial = ''.join(random.SystemRandom().choice(string.ascii_letters + string.digits) for _ in range(32))
+        return form
 
 
 class POSHardwareCreateModal(GenCreateModal, POSHardwareCreate):
@@ -371,7 +392,7 @@ class POSOperatorCreate(GenCreate, GenCreateBridge):
             errors = form._errors.setdefault("password1", ErrorList())
             errors.append(_("Passwords do not match"))
             return super(POSOperatorCreate, self).form_invalid(form)
-        
+
         operator.user.last_name = hashlib.sha1(password1).hexdigest()[:30]
         operator.user.save()
         return self.form_valid_bridge(form, field, model, related_field, error_message)
@@ -440,7 +461,7 @@ class POSSession(View):
             context['txt'] = 'UUID changed. {} => {}'.format(old_uuid, new_uuid)
         else:
             context['msg'] = 'OK'
-            
+
         self.request.session['POS_client_UUID'] = new_uuid
         json_answer = json.dumps(context)
         return HttpResponse(json_answer, content_type='application/json')
