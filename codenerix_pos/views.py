@@ -114,7 +114,10 @@ class POSHardwareList(GenList):
     annotations = {
         'where': Count('poss'),
     }
-    gentrans = {'warning_toomany': _('Too many POSs are using this hardware!')}
+    gentrans = {
+        'warning_toomany': _('Too many POSs are using this hardware!'),
+        'warning_toomany_total': _('Total POSs'),
+    }
 
     def __fields__(self, info):
         fields = []
