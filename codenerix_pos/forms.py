@@ -94,6 +94,7 @@ class POSHardwareForm(GenModelForm):
                 ['kind', 4],
                 ['name', 4],
                 ['enable', 6],
+                ['key', 6],
                 ['config', 12],
             )
         ]

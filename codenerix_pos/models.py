@@ -129,7 +129,7 @@ class POSHardware(CodenerixModel):
     """
     Hardware
     """
-    pos = models.ForeignKey("POS", related_name='hardwares', verbose_name=_("Hardware"), blank=True, null=True)
+    pos = models.ForeignKey("POS", related_name='hardwares', verbose_name=_("POS"), blank=True, null=True)
     kind = models.CharField(_("Kind"), max_length=6, choices=KIND_POSHARDWARE, blank=False, null=False)
     name = models.CharField(_("Name"), max_length=250, blank=False, null=False, unique=True)
     enable = models.BooleanField(_('Enable'), default=True)
