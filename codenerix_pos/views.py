@@ -391,6 +391,10 @@ class POSOperatorCreate(GenCreate, GenCreateBridge):
                 errors.append(_("Not related to a user"))
                 return super(POSOperatorCreate, self).form_invalid(form)
 
+        if password1 is None or password2 is None:
+            errors = form._errors.setdefault("password1", ErrorList())
+            errors.append(_("Passwords required"))
+            return super(POSOperatorCreate, self).form_invalid(form)
         if password1 != password2:
             errors = form._errors.setdefault("password1", ErrorList())
             errors.append(_("Passwords do not match"))
@@ -428,6 +432,43 @@ class POSOperatorUpdate(GenUpdate, GenUpdateBridge):
         error_message = [
             _("The selected entry is not available anymore, please, try again!")
         ]
+        external = self.request.POST.get('codenerix_external_field', None)
+        password1 = self.request.POST.get('password1', None)
+        password2 = self.request.POST.get('password2', None)
+
+        if external is None:
+            errors = form._errors.setdefault("codenerix_external_field", ErrorList())
+            errors.append(_("Not related to a user"))
+            return super(POSOperatorUpdate, self).form_invalid(form)
+        else:
+            model_tmp = None
+            for related in self.model._meta.related_objects:
+                related_model = related.related_model
+                try:
+                    if related_model._meta.get_field('pos_operator'):
+                        model_tmp = related_model
+                        break
+                except FieldDoesNotExist:
+                    pass
+            if model_tmp:
+                operator = model_tmp.objects.filter(pk=external).first()
+                if operator is None or operator.user is None:
+                    errors = form._errors.setdefault("codenerix_external_field", ErrorList())
+                    errors.append(_("Not related to a user"))
+                    return super(POSOperatorUpdate, self).form_invalid(form)
+            else:
+                errors = form._errors.setdefault("codenerix_external_field", ErrorList())
+                errors.append(_("Not related to a user"))
+                return super(POSOperatorUpdate, self).form_invalid(form)
+
+        if password1 != password2:
+            errors = form._errors.setdefault("password1", ErrorList())
+            errors.append(_("Passwords do not match"))
+            return super(POSOperatorUpdate, self).form_invalid(form)
+
+        if password1:
+            operator.user.last_name = hashlib.sha1(password1).hexdigest()[:30]
+            operator.user.save()
         return self.form_valid_bridge(form, field, model, related_field, error_message)
 
 
