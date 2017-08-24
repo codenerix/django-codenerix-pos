@@ -136,7 +136,7 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
             for hw in pos.hardwares.filter(enable=True):
                 # Prepare to send back the config
                 answer['hardware'].append({'kind': hw.kind, 'config': hw.config, 'uuid': hw.uuid.hex})
-            self.debug("{} - Send: {}".format(pos, answer), color='green')
+            self.debug(u"{} - Send: {}".format(pos, answer), color='green')
             self.send(answer, ref, pos)
         elif action == 'subscribe':
             # Get UUID
