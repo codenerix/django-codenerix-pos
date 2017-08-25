@@ -131,12 +131,15 @@ class POSHardware(CodenerixModel):
     """
     pos = models.ForeignKey("POS", related_name='hardwares', verbose_name=_("POS"), blank=True, null=True)
     kind = models.CharField(_("Kind"), max_length=6, choices=KIND_POSHARDWARE, blank=False, null=False)
-    name = models.CharField(_("Name"), max_length=250, blank=False, null=False, unique=True)
+    name = models.CharField(_("Name"), max_length=250, blank=False, null=False)
     enable = models.BooleanField(_('Enable'), default=True)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     key = models.CharField(_("Key"), max_length=32, blank=False, null=False, unique=True)
     config = JSONField(_("config"), blank=True, null=True)
     value = JSONField(_("config"), blank=True, null=True)
+
+    class Meta:
+        unique_together = ('pos', 'kind', 'name')
 
     def __unicode__(self):
         return self.__str__()
