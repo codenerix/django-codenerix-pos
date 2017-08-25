@@ -1,7 +1,6 @@
 <td ng-class='{"bg-warning": row.where>1, "bg-danger": row.where<1}'>{{row.pos|codenerix}}</td>
 <td ng-class='{"bg-warning": row.where>1, "bg-danger": row.where<1}'>{{row.get_kind_display|codenerix}}</td>
 <td ng-class='{"bg-warning": row.where>1, "bg-danger": row.where<1}'>
-    #{{row.where}}#
     {{row.name|codenerix}}
     <span class='fa fa-exclamation-triangle text-danger' title='{{data.meta.gentranslate.warning_toomany}} ({{data.meta.gentranslate.warning_toomany_total}}: {{row.where}})' ng-if='row.where>1'></span>
     <span class='fa fa-exclamation-triangle text-danger' title='{{data.meta.gentranslate.warning_notused}}' ng-if='row.where<1'></span>
