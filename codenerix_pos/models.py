@@ -145,7 +145,7 @@ class POSHardware(CodenerixModel):
         return self.__str__()
 
     def __str__(self):
-        return u"{}".format(smart_text(self.name))
+        return u"{}: {} ({})".format(smart_text(self.pos.name), smart_text(self.name), smart_text(self.kind))
 
     def __fields__(self, info):
         fields = []
