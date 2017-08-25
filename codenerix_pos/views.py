@@ -118,7 +118,7 @@ class POSHardwareList(GenList):
         'warning_toomany': _('Too many POSs are using this hardware!'),
         'warning_toomany_total': _('Total POSs'),
     }
-    default_ordering = ["pos", "kind", "name"]
+    default_ordering = ["pos__name", "kind", "name"]
 
     def __fields__(self, info):
         fields = []
