@@ -117,6 +117,7 @@ class POSHardwareList(GenList):
     gentrans = {
         'warning_toomany': _('Too many POSs are using this hardware!'),
         'warning_toomany_total': _('Total POSs'),
+        'warning_notused': _('No POS is using this hardware!'),
     }
     default_ordering = ["pos__name", "kind", "name"]
 
