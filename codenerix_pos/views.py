@@ -31,7 +31,7 @@ from django.utils.translation import ugettext as _
 from django.views.generic import View
 from django.db.models import Count
 
-from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUpdateModal, GenDelete, GenDetail, GenDetailModal
+from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUpdateModal, GenDelete, GenDetail, GenDetailModal, GenForeignKey
 from codenerix_extensions.views import GenCreateBridge, GenUpdateBridge
 
 from .models import POSZone, POSHardware, POS, POSSlot, POSPlant, POSProduct, POSLog, POSOperator
@@ -119,7 +119,7 @@ class POSHardwareList(GenList):
         'warning_toomany_total': _('Total POSs'),
         'warning_notused': _('No POS is using this hardware!'),
     }
-    default_ordering = ["pos", "kind", "name"]
+    default_ordering = ["pos__name", "kind", "name"]
 
     def __fields__(self, info):
         fields = []
@@ -180,6 +180,22 @@ class POSHardwareDetails(GenDetail):
 
 class POSHardwareDetailModal(GenDetailModal, POSHardwareDetails):
     pass
+
+
+class POSHardwareForeign(GenForeignKey):
+    model = POSHardware
+    label = '{pos__name} - {name} - {kind}'
+
+    def get_foreign(self, queryset, search, filters):
+        # Filter with search string
+        qsobject = Q(name__icontains=search)
+        qsobject = Q(uuid__icontains=search)
+        qsobject = Q(key__icontains=search)
+        qsobject = Q(pos__name__icontains=search)
+
+        queryset = queryset.filter(qsobject)
+
+        return queryset
 
 
 # ###########################################

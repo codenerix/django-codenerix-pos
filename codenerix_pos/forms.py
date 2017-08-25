@@ -23,6 +23,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from codenerix.forms import GenModelForm
 from codenerix_extensions.helpers import get_external_model
+from codenerix.widgets import MultiStaticSelect
 
 from .models import POSZone, POSHardware, POS, POSSlot, POSPlant, POSProduct, POSOperator
 
@@ -139,6 +140,14 @@ class POSHardwareForm(GenModelForm):
 
 class POSFormCreate(GenModelForm):
     key = forms.CharField(min_length=32, max_length=32, widget=forms.widgets.HiddenInput(), required=True)
+    hardware = forms.ModelMultipleChoiceField(
+        queryset=POSHardware.objects.all().order_by('pos__name', 'kind', 'name'),
+        label=_('Hardware it can use'),
+        required=False,
+        widget=MultiStaticSelect(
+            attrs={'manytomany': True, }
+        )
+    )
 
     class Meta:
         model = POS
@@ -150,13 +159,21 @@ class POSFormCreate(GenModelForm):
                 _('Details'), 12,
                 ['name', 3],
                 ['zone', 3],
-                ['hardware', 3],
+                ['hardware', 6],
             )
         ]
 
 
 class POSForm(GenModelForm):
     key = forms.CharField(label=_("Key"), min_length=32, max_length=32, widget=forms.widgets.Input(), required=True)
+    hardware = forms.ModelMultipleChoiceField(
+        queryset=POSHardware.objects.all().order_by('pos__name', 'kind', 'name'),
+        label=_('Hardware it can use'),
+        required=False,
+        widget=MultiStaticSelect(
+            attrs={'manytomany': True, }
+        )
+    )
 
     class Meta:
         model = POS
@@ -169,7 +186,7 @@ class POSForm(GenModelForm):
                 ['name', 4],
                 ['key', 4],
                 ['zone', 4],
-                ['hardware', 6],
+                ['hardware', 12],
             )
         ]
 
