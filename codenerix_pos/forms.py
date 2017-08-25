@@ -141,7 +141,7 @@ class POSHardwareForm(GenModelForm):
 class POSFormCreate(GenModelForm):
     key = forms.CharField(min_length=32, max_length=32, widget=forms.widgets.HiddenInput(), required=True)
     hardware = forms.ModelMultipleChoiceField(
-        queryset=POSHardware.objects.all(),
+        queryset=POSHardware.objects.all().order_by('pos__name', 'kind', 'name'),
         label=_('Hardware it can use'),
         required=False,
         widget=MultiStaticSelect(
@@ -167,7 +167,7 @@ class POSFormCreate(GenModelForm):
 class POSForm(GenModelForm):
     key = forms.CharField(label=_("Key"), min_length=32, max_length=32, widget=forms.widgets.Input(), required=True)
     hardware = forms.ModelMultipleChoiceField(
-        queryset=POSHardware.objects.all(),
+        queryset=POSHardware.objects.all().order_by('pos__name', 'kind', 'name'),
         label=_('Hardware it can use'),
         required=False,
         widget=MultiStaticSelect(
