@@ -528,6 +528,11 @@ class POSSession(View):
             context['txt'] = 'UUID changed. {} => {}'.format(old_uuid, new_uuid)
         else:
             context['msg'] = 'OK'
+            context['posname'] = ''
+            if new_uuid:
+                pos = POS.objects.filter(uuid=new_uuid).first()
+                if pos:
+                    context['posname'] = pos.name
 
         self.request.session['POS_client_UUID'] = new_uuid
         json_answer = json.dumps(context)
