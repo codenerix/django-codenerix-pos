@@ -22,6 +22,9 @@ $(function() {
                 $.post('/codenerix_pos/pos_session', data, function(data){
                     if (data['msg'] != 'OK'){
                         console.log(data['txt']);
+                        if (local_uuid_callback != undefined){
+                            local_uuid_callback(data);
+                        }
                     }
                 }).done(function(data){
 
