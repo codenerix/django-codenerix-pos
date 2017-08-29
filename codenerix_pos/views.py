@@ -530,6 +530,6 @@ class POSSession(View):
         else:
             context['msg'] = 'OK'
 
-        self.request.session['POS_client_UUID'] = new_uuid
+        request.session['POS_client_UUID'] = new_uuid
         json_answer = json.dumps(context)
         return HttpResponse(json_answer, content_type='application/json')
