@@ -235,7 +235,7 @@ class POS(CodenerixModel):
         return fields
 
     def have_cash_drawer(self):
-        return self.hardwares.filter(kind=KIND_POSHARDWARE_CASH).exists()
+        return self.hardware.filter(kind=KIND_POSHARDWARE_CASH).exists()
 
     def save(self, *args, **kwargs):
         if 'doreset' in kwargs:
