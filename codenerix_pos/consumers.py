@@ -39,7 +39,7 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
             for pos in poss:
                 pos.channel = None
                 pos.save(doreset=False)
-                self.warning("{} - Client got disconnected - {}".format(pos, pos.uuid))
+                self.warning("{} - Client got disconnected - {}".format(pos.name.encode('ascii', 'ignore'), pos.uuid))
         else:
             self.warning("Client got disconnected - REPLY CHANNEL NOT FOUND: {}".format(message.reply_channel))
 
@@ -51,7 +51,7 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
             super(POSConsumer, self).send({'message': json.dumps(answer)})
         else:
             # Use normal send (protected)
-            self.warning("Send '{}' to {}".format(msg, pos))
+            self.warning("{} - Send '{}' to {} - {}".format(pos.name.encode('ascii', 'ignore'), msg, pos, pos.uuid))
             self.send(answer, ref, pos)
 
     def send(self, request, ref=None, pos=None):
@@ -130,7 +130,7 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
         Called when a message is received with decoded JSON content
         """
 
-        self.debug("{} - Receive: {} (ref:{}) - {}".format(pos, message, ref, pos.uuid), color="cyan")
+        self.debug("{} - Receive: {} (ref:{}) - {}".format(pos.name.encode('ascii', 'ignore'), message, ref, pos.uuid), color="cyan")
 
         action = message.get('action', None)
 
@@ -143,7 +143,7 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
             for hw in pos.hardwares.filter(enable=True):
                 # Prepare to send back the config
                 answer['hardware'].append({'kind': hw.kind, 'config': hw.config, 'uuid': hw.uuid.hex})
-            self.debug(u"{} - Send: {} - {}".format(pos, answer, pos.uuid), color='green')
+            self.debug(u"{} - Send: {} - {}".format(pos.name.encode('ascii', 'ignore'), answer, pos.uuid), color='green')
             self.send(answer, ref, pos)
         elif action == 'subscribe':
             # Get UUID
@@ -155,7 +155,7 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
                 if poshw:
                     if poshw.enable:
                         # Suscribe this websocket to group
-                        self.debug("{} - Subscribed to '{}' - {}".format(pos, uid.hex, pos.uuid), color="purple")
+                        self.debug("{} - Subscribed to '{}' - {}".format(pos.name.encode('ascii', 'ignore'), uid.hex, pos.uuid), color="purple")
                         Group(uid.hex).add(self.message.reply_channel)
                         self.send({'action': 'subscribed', 'uuid': uid.hex, 'key': poshw.key}, ref, pos)
                     else:
@@ -170,23 +170,23 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
             if uid:
                 origin = POSHardware.objects.filter(uuid=uuid.UUID(uid)).first()
                 if origin:
-                    self.debug("{} - Got a message from {}: {} (ref:{}) - {}".format(pos, origin.uuid, msg, ref, pos.uuid), color='purple')
+                    self.debug("{} - Got a message from {}: {} (ref:{}) - {}".format(pos.name.encode('ascii', 'ignore'), origin.uuid, msg, ref, pos.uuid), color='purple')
                     origin.recv(msg)
                 else:
-                    self.debug("{} - Got a message from UNKNOWN {}: {} (ref:{}) - {}".format(pos, uid, msg, ref, pos.uuid), color='purple')
+                    self.debug("{} - Got a message from UNKNOWN {}: {} (ref:{}) - {}".format(pos.name.encode('ascii', 'ignore'), uid, msg, ref, pos.uuid), color='purple')
             else:
-                self.debug("{} - Got a message from NO-UUID: {} (ref:{}) - {}".format(pos, msg, ref, pos.uuid), color='purple')
+                self.debug("{} - Got a message from NO-UUID: {} (ref:{}) - {}".format(pos.name.encode('ascii', 'ignore'), msg, ref, pos.uuid), color='purple')
         elif action == 'ping':
             super(POSConsumer, self).send({'message': json.dumps({'action': 'pong', 'ref': ref})})
         elif action == 'pong':
-            self.debug("{} - Got PONG {} (ref:{}) - {}".format(pos, message.get('ref', '-'), ref, pos.uuid), color='white')
+            self.debug("{} - Got PONG {} (ref:{}) - {}".format(pos.name.encode('ascii', 'ignore'), message.get('ref', '-'), ref, pos.uuid), color='white')
         elif action == 'error':
             uid = message.get('uuid', None)
             msg = message.get('error', 'No error')
             if uid:
-                self.error("{} - Got an error from {}: {} (UUID:{}) (ref:{}) - {}".format(pos, pos.uuid, msg, uid, ref, pos.uuid))
+                self.error("{} - Got an error from {}: {} (UUID:{}) (ref:{}) - {}".format(pos.name.encode('ascii', 'ignore'), pos.uuid, msg, uid, ref, pos.uuid))
             else:
-                self.error("{} - Got an error from {}: {}) (ref:{}) - {}".format(pos, pos.uuid, msg, ref, pos.uuid))
+                self.error("{} - Got an error from {}: {}) (ref:{}) - {}".format(pos.name.encode('ascii', 'ignore'), pos.uuid, msg, ref, pos.uuid))
             log = POSLog()
             log.pos = pos
             if uid:
