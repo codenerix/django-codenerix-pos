@@ -306,6 +306,7 @@ class POSSlotDetailModal(GenDetailModal, POSSlotDetails):
 class POSProductList(GenList):
     model = POSProduct
     extra_context = {'menu': ['pos', 'posproduct'], 'bread': [_('POS'), _('Product')]}
+    default_ordering = ["pos__name", ]
 
 
 class POSProductCreate(GenCreate):
