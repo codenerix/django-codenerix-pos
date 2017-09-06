@@ -39,7 +39,7 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
             for pos in poss:
                 pos.channel = None
                 pos.save(doreset=False)
-                self.warning("Client got disconnected - {}".format(pos.uuid))
+                self.warning("{} - Client got disconnected - {}".format(pos.name, pos.uuid))
         else:
             self.warning("Client got disconnected - REPLY CHANNEL NOT FOUND: {}".format(message.reply_channel))
 
@@ -130,7 +130,7 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
         Called when a message is received with decoded JSON content
         """
 
-        self.debug("Receive: {} (ref:{})".format(message, ref), color="cyan")
+        self.debug("{} - Receive: {} (ref:{}) - {}".format(pos.name, message, ref, pos.uuid), color="cyan")
 
         action = message.get('action', None)
 
@@ -143,7 +143,7 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
             for hw in pos.hardwares.filter(enable=True):
                 # Prepare to send back the config
                 answer['hardware'].append({'kind': hw.kind, 'config': hw.config, 'uuid': hw.uuid.hex})
-            self.debug(u"{} - Send: {}".format(pos, answer), color='green')
+            self.debug(u"{} - Send: {} - {}".format(pos.name, answer, pos.uuid), color='green')
             self.send(answer, ref, pos)
         elif action == 'subscribe':
             # Get UUID
@@ -155,7 +155,7 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
                 if poshw:
                     if poshw.enable:
                         # Suscribe this websocket to group
-                        self.debug("Subscribed to '{}'".format(uid.hex), color="purple")
+                        self.debug("{} - Subscribed to '{}' - {}".format(pos.name, uid.hex, pos.uuid), color="purple")
                         Group(uid.hex).add(self.message.reply_channel)
                         self.send({'action': 'subscribed', 'uuid': uid.hex, 'key': poshw.key}, ref, pos)
                     else:
@@ -170,23 +170,23 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
             if uid:
                 origin = POSHardware.objects.filter(uuid=uuid.UUID(uid)).first()
                 if origin:
-                    self.debug("Got a message from {}: {} (ref:{})".format(origin.uuid, msg, ref), color='purple')
+                    self.debug("{} - Got a message from {}: {} (ref:{}) - {}".format(pos.name, origin.uuid, msg, ref, pos.uuid), color='purple')
                     origin.recv(msg)
                 else:
-                    self.debug("Got a message from UNKNOWN {}: {} (ref:{})".format(uid, msg, ref), color='purple')
+                    self.debug("{} - Got a message from UNKNOWN {}: {} (ref:{}) - {}".format(pos.name, uid, msg, ref, pos.uuid), color='purple')
             else:
-                self.debug("Got a message from NO-UUID: {} (ref:{})".format(msg, ref), color='purple')
+                self.debug("{} - Got a message from NO-UUID: {} (ref:{}) - {}".format(pos.name, msg, ref, pos.uuid), color='purple')
         elif action == 'ping':
             super(POSConsumer, self).send({'message': json.dumps({'action': 'pong', 'ref': ref})})
         elif action == 'pong':
-            self.debug("Got PONG {} (ref:{})".format(message.get('ref', '-'), ref), color='white')
+            self.debug("{} - Got PONG {} (ref:{}) - {}".format(pos.name, message.get('ref', '-'), ref, pos.uuid), color='white')
         elif action == 'error':
             uid = message.get('uuid', None)
             msg = message.get('error', 'No error')
             if uid:
-                self.error("Got an error from {}: {} (UUID:{}) (ref:{})".format(pos.uuid, msg, uid, ref))
+                self.error("{} - Got an error from {}: {} (UUID:{}) (ref:{}) - {}".format(pos.name, pos.uuid, msg, uid, ref, pos.uuid))
             else:
-                self.error("Got an error from {}: {}) (ref:{})".format(pos.uuid, msg, ref))
+                self.error("{} - Got an error from {}: {}) (ref:{}) - {}".format(pos.name, pos.uuid, msg, ref, pos.uuid))
             log = POSLog()
             log.pos = pos
             if uid:
