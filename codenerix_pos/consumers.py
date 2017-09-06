@@ -34,7 +34,14 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
             })
 
     def disconnect(self, message, **kwargs):
-        self.warning("Client got disconnected - {}".format(self.uuid))
+        poss = POS.objects.filter(channel=message.reply_channel)
+        if poss.count():
+            for pos in poss:
+                pos.channel = None
+                pos.save(doreset=False)
+                self.warning("Client got disconnected - {}".format(pos.uuid))
+        else:
+            self.warning("Client got disconnected - REPLY CHANNEL NOT FOUND: {}".format(message.reply_channel))
 
     def send_error(self, msg, ref=None, pos=None):
         answer = {'action': 'error', 'error': msg}
