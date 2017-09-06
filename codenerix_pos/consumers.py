@@ -34,7 +34,7 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
             })
 
     def disconnect(self, message, **kwargs):
-        self.warning("Client got disconnected - {}".format(uuid))
+        self.warning("Client got disconnected - {}".format(self.uuid))
 
     def send_error(self, msg, ref=None, pos=None):
         answer = {'action': 'error', 'error': msg}
