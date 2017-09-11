@@ -421,11 +421,11 @@ class POSOperatorCreate(GenCreate, GenCreateBridge):
 
         try:
             # python 2.7
-            operator.user.last_name = hashlib.sha1(password1).hexdigest()[:30]
+            operator.user.last_name = hashlib.sha1(password1.encode()).hexdigest()[:30]
         except TypeError:
             # python 3.x
             password1_str = bytes(password1, encoding='utf-8')
-            operator.user.last_name = hashlib.sha1(password1_str).hexdigest()[:30]
+            operator.user.last_name = hashlib.sha1(password1_str.encode()).hexdigest()[:30]
         operator.user.save()
         return self.form_valid_bridge(form, field, model, related_field, error_message)
 
@@ -486,7 +486,7 @@ class POSOperatorUpdate(GenUpdate, GenUpdateBridge):
             return super(POSOperatorUpdate, self).form_invalid(form)
 
         if password1:
-            operator.user.last_name = hashlib.sha1(password1).hexdigest()[:30]
+            operator.user.last_name = hashlib.sha1(password1.encode()).hexdigest()[:30]
             operator.user.save()
         return self.form_valid_bridge(form, field, model, related_field, error_message)
 
