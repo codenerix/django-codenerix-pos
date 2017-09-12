@@ -20,16 +20,15 @@ $(function() {
                 
                 data['csrfmiddlewaretoken'] = $("input[name='csrfmiddlewaretoken']").val();
                 $.post('/codenerix_pos/pos_session', data, function(data){
-                    if (data['msg'] != 'OK'){
-                        console.log(data['txt']);
-                        if (local_uuid_callback != undefined){
-                            local_uuid_callback(data);
-                        }
+                    if (typeof(local_uuid_callback) != "undefined"){
+                        local_uuid_callback(data);
                     }
                 }).done(function(data){
 
                 }).fail(function(data){
-                    alert(data);
+                    console.error("POS GET Local UUID error detected!");
+                    console.error(data);
+                    alert("POS GET LOCAL UUID ERROR!");
                 }).always(function(data){
 
                 });
