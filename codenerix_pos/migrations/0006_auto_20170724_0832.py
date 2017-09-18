@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('codenerix_products', '0022_typetax_default'),
-        ('corporate', '0002_auto_20170724_0832'),
+        ('codenerix_corporate', '0002_auto_20170724_0832'),
         ('codenerix_invoicing', '0022_auto_20170724_0832'),
         ('codenerix_pos', '0005_auto_20170719_1454'),
     ]
@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
                 ('updated', models.DateTimeField(auto_now=True, verbose_name='Updated')),
                 ('name', models.CharField(max_length=250, unique=True, verbose_name='Name')),
                 ('billing_series', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='posplants', to='codenerix_invoicing.BillingSeries', verbose_name=b'Billing series')),
-                ('corporate_image', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='posplants', to='corporate.CorporateImage', verbose_name='Corporate image')),
+                ('corporate_image', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='posplants', to='codenerix_corporate.CorporateImage', verbose_name='Corporate image')),
             ],
             options={
                 'default_permissions': ('add', 'change', 'delete', 'view', 'list'),
