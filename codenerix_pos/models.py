@@ -33,7 +33,7 @@ from jsonfield import JSONField
 from codenerix_payments.models import PaymentRequest
 
 from codenerix.models import CodenerixModel
-from codenerix_extensions.corporate.models import CorporateImage
+from codenerix_corporate.models import CorporateImage
 from codenerix_products.models import ProductFinal
 from codenerix_invoicing.models import BillingSeries
 from codenerix_extensions.lib.cryptography import AESCipher
