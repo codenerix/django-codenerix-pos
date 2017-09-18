@@ -405,7 +405,7 @@ class POSOperator(GenRole, CodenerixModel):
             'foreignkey_posoperator': ('CDNX_get_fk_info_posoperator', _('---')),
         }
 
-    pos = models.ForeignKey(POS, related_name='pos_operators', verbose_name=_('POS'))
+    pos = models.ManyToManyField(POS, related_name='pos_operators', verbose_name=_('POS'))
     enable = models.BooleanField(_("Enable"), blank=False, null=False, default=True)
 
     @staticmethod
