@@ -524,6 +524,7 @@ class POSSession(View):
         context = {}
         old_uuid = self.request.session.get('POS_client_UUID', None)
         new_uuid = request.POST.get('uuid', None)
+        commit = request.POST.get('commit', None)
 
         if old_uuid and new_uuid and old_uuid != new_uuid:
             context['msg'] = 'KO'
@@ -531,11 +532,13 @@ class POSSession(View):
         else:
             context['msg'] = 'OK'
             context['posname'] = ''
+            context['commit'] = commit
             if new_uuid:
                 pos = POS.objects.filter(uuid=new_uuid).first()
                 if pos:
                     context['posname'] = pos.name
 
         request.session['POS_client_UUID'] = new_uuid
+        request.session['POS_client_COMMIT'] = commit
         json_answer = json.dumps(context)
         return HttpResponse(json_answer, content_type='application/json')
