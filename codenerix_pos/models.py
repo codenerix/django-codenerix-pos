@@ -233,6 +233,7 @@ class POS(CodenerixModel):
         fields.append(('key', _("Key")))
         fields.append(('channel', _("Channel")))
         fields.append(('hardware', _("Hardware")))
+        fields.append(('commit', _("Commit")))
         return fields
 
     def have_cash_drawer(self):
