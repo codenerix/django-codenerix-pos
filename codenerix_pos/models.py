@@ -249,7 +249,10 @@ class POS(CodenerixModel):
             doreset = True
         result = super(POS, self).save(*args, **kwargs)
         if self.channel and doreset:
-            self.reset_client()
+            try:
+                self.reset_client()
+            except IOError:
+                pass
         return result
 
     def reset_client(self):
