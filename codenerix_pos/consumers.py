@@ -139,6 +139,7 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
             # Get all the hardware connected to this POS
             answer = {}
             answer['action'] = 'config'
+            answer['commit'] = pos.commit
             answer['hardware'] = []
             for hw in pos.hardwares.filter(enable=True):
                 # Prepare to send back the config

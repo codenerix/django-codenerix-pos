@@ -8,6 +8,11 @@ $(function() {
     // console.log("Connecting to " + ws_path)
     var socket = new WebSocket(ws_path);
     if (socket) {
+        socket.onerror = function(ev) {
+            if (typeof(local_uuid_callback) != "undefined"){
+                local_uuid_callback(undefined, true);
+            }
+        }
         socket.onmessage = function(message) {
             socket.close();
             try {
@@ -23,7 +28,7 @@ $(function() {
                 data['csrfmiddlewaretoken'] = $("input[name='csrfmiddlewaretoken']").val();
                 $.post('/codenerix_pos/pos_session', data, function(data){
                     if (typeof(local_uuid_callback) != "undefined"){
-                        local_uuid_callback(data);
+                        local_uuid_callback(data, false);
                     }
                 }).done(function(data){
 
