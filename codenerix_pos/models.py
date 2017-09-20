@@ -167,7 +167,10 @@ class POSHardware(CodenerixModel):
 
         result = super(POSHardware, self).save(*args, **kwargs)
         if doreset:
-            self.pos.reset_client()
+            try:
+                self.pos.reset_client()
+            except IOError:
+                pass
         return result
 
     def recv(self, msg):
