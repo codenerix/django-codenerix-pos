@@ -23,7 +23,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from codenerix.forms import GenModelForm
 from codenerix_extensions.helpers import get_external_model
-from codenerix.widgets import MultiStaticSelect
+from codenerix.widgets import MultiStaticSelect, DynamicSelect
 
 from .models import POSZone, POSHardware, POS, POSSlot, POSPlant, POSProduct, POSOperator
 
@@ -82,42 +82,24 @@ class POSZoneForm(GenModelForm):
         ]
 
 
-class POSHardwareFormCreate(GenModelForm):
-    key = forms.CharField(min_length=32, max_length=32, widget=forms.widgets.HiddenInput(), required=True)
-
-    class Meta:
-        model = POSHardware
-        exclude = ['value']
-
-    def __groups__(self):
-        return [
-            (
-                _('Details'), 12,
-                ['pos', 4],
-                ['kind', 4],
-                ['name', 4],
-                ['enable', 6],
-                ['config', 12],
-            )
-        ]
-
-
 class POSHardwareForm(GenModelForm):
-    key = forms.CharField(label=_("Key"), min_length=32, max_length=32, widget=forms.widgets.Input(), required=True)
 
     class Meta:
         model = POSHardware
         exclude = ['value']
+        autofill = {
+            'profile': ['select', 3, 'CDNX_poshardwares_profiles'],
+        }
 
     def __groups__(self):
         return [
             (
                 _('Details'), 12,
-                ['pos', 4],
-                ['kind', 4],
-                ['name', 4],
-                ['enable', 6],
-                ['key', 6],
+                ['name', 2],
+                ['kind', 3],
+                ['pos', 3],
+                ['profile', 3],
+                ['enable', 1],
                 ['config', 12],
             )
         ]
@@ -132,40 +114,14 @@ class POSHardwareForm(GenModelForm):
                 ['name', 6],
                 ['enable', 6],
                 ['uuid', 6],
+                ['profile', 6],
                 ['config', 6],
                 ['value', 6],
             )
         ]
 
 
-class POSFormCreate(GenModelForm):
-    key = forms.CharField(min_length=32, max_length=32, widget=forms.widgets.HiddenInput(), required=True)
-    hardware = forms.ModelMultipleChoiceField(
-        queryset=POSHardware.objects.all().order_by('pos__name', 'kind', 'name'),
-        label=_('Hardware it can use'),
-        required=False,
-        widget=MultiStaticSelect(
-            attrs={'manytomany': True, }
-        )
-    )
-
-    class Meta:
-        model = POS
-        exclude = ['payments', 'uuid']
-
-    def __groups__(self):
-        return [
-            (
-                _('Details'), 12,
-                ['name', 3],
-                ['zone', 3],
-                ['hardware', 6],
-            )
-        ]
-
-
 class POSForm(GenModelForm):
-    key = forms.CharField(label=_("Key"), min_length=32, max_length=32, widget=forms.widgets.Input(), required=True)
     hardware = forms.ModelMultipleChoiceField(
         queryset=POSHardware.objects.all().order_by('pos__name', 'kind', 'name'),
         label=_('Hardware it can use'),
@@ -184,9 +140,8 @@ class POSForm(GenModelForm):
             (
                 _('Details'), 12,
                 ['name', 4],
-                ['key', 4],
                 ['zone', 4],
-                ['hardware', 12],
+                ['hardware', 4],
             )
         ]
 

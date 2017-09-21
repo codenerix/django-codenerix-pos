@@ -23,7 +23,7 @@ from django.views.generic import TemplateView
 
 from .views import POSZoneList, POSZoneCreate, POSZoneCreateModal, POSZoneUpdate, POSZoneUpdateModal, POSZoneDelete, POSZoneDetails
 from .views import POSHardwareList, POSHardwareCreate, POSHardwareCreateModal, POSHardwareUpdate, POSHardwareUpdateModal, POSHardwareDelete, POSHardwareSubList, POSHardwareDetails, POSHardwareDetailModal
-from .views import POSHardwareForeign
+from .views import POSHardwareForeign, POSHardwareProfiles
 from .views import POSList, POSCreate, POSCreateModal, POSUpdate, POSUpdateModal, POSDelete, POSSubList, POSDetails, POSDetailModal
 from .views import POSSlotList, POSSlotCreate, POSSlotCreateModal, POSSlotUpdate, POSSlotUpdateModal, POSSlotDelete, POSSlotSubList, POSSlotDetails, POSSlotDetailModal
 from .views import POSPlantList, POSPlantCreate, POSPlantCreateModal, POSPlantUpdate, POSPlantUpdateModal, POSPlantDelete, POSPlantDetails
@@ -79,6 +79,7 @@ urlpatterns = [
     url(r'^poshardwares/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/editmodal$', POSHardwareUpdateModal.as_view(), name='CDNX_poshardwares_sublist_editmodal'),
     url(r'^poshardwares/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/delete$', POSHardwareDelete.as_view(), name='CDNX_poshardwares_sublist_delete'),
     url(r'^poshardwares/foreign/(?P<search>[\w\W]+|\*)$', POSHardwareForeign.as_view(), name='CDNX_poshardwares_foreign'),
+    url(r'^poshardwares/profiles/(?P<search>[\w\W]+|\*)$', POSHardwareProfiles.as_view(), name='CDNX_poshardwares_profiles'),
 
 
     url(r'^poss$', POSList.as_view(), name='CDNX_poss_list'),

@@ -21,6 +21,8 @@
 import json
 import uuid
 import hashlib
+import random
+import string
 from channels import Channel, Group
 
 from django.db import models
@@ -85,6 +87,10 @@ KIND_POSHARDWARE = (
 )
 
 
+def keymaker():
+    return ''.join(random.SystemRandom().choice(string.ascii_letters + string.digits) for _ in range(32))
+
+
 class POSPlant(CodenerixModel):
     """
     Plant
@@ -134,7 +140,8 @@ class POSHardware(CodenerixModel):
     name = models.CharField(_("Name"), max_length=250, blank=False, null=False)
     enable = models.BooleanField(_('Enable'), default=True)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    key = models.CharField(_("Key"), max_length=32, blank=False, null=False, unique=True)
+    key = models.CharField(_("Key"), max_length=32, blank=False, null=False, unique=True, editable=False, default=keymaker)
+    profile = models.CharField(_("Profile"), max_length=30, blank=True, null=False, default='CONFIG')
     config = JSONField(_("config"), blank=True, null=True)
     value = JSONField(_("config"), blank=True, null=True)
 
@@ -155,6 +162,7 @@ class POSHardware(CodenerixModel):
         fields.append(('enable', _("Enable")))
         fields.append(('uuid', _("UUID")))
         fields.append(('key', _("Key")))
+        fields.append(('profile', _("Profile")))
         fields.append(('config', _("Config")))
         fields.append(('value', _("Value")))
         return fields
@@ -214,7 +222,7 @@ class POS(CodenerixModel):
     '''
     name = models.CharField(_("Name"), max_length=250, blank=False, null=False, unique=True)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    key = models.CharField(_("Key"), max_length=32, blank=False, null=False, unique=True)
+    key = models.CharField(_("Key"), max_length=32, blank=False, null=False, unique=True, editable=False, default=keymaker)
     zone = models.ForeignKey(POSZone, related_name='poss', verbose_name=_("Zone"))
     payments = models.ManyToManyField(PaymentRequest, related_name='poss', verbose_name=_("Payments"), blank=True)
     channel = models.CharField(_("Channel"), max_length=50, blank=True, null=True, unique=True, editable=False)

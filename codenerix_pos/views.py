@@ -20,8 +20,6 @@
 
 import json
 import hashlib
-import random
-import string
 
 from django.db.models import Q
 from django.db.models.fields import FieldDoesNotExist
@@ -35,7 +33,7 @@ from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUp
 from codenerix_extensions.views import GenCreateBridge, GenUpdateBridge
 
 from .models import POSZone, POSHardware, POS, POSSlot, POSPlant, POSProduct, POSLog, POSOperator
-from .forms import POSZoneForm, POSHardwareForm, POSHardwareFormCreate, POSForm, POSFormCreate, POSSlotForm, POSPlantForm, POSProductForm, POSOperatorForm
+from .forms import POSZoneForm, POSHardwareForm, POSForm, POSSlotForm, POSPlantForm, POSProductForm, POSOperatorForm
 
 
 # ###########################################
@@ -129,6 +127,7 @@ class POSHardwareList(GenList):
         fields.append(('enable', _("Enable")))
         fields.append(('uuid', _("UUID")))
         fields.append(('key', _("Key")))
+        fields.append(('profile', _("Profile")))
         fields.append(('config', _("Config")))
         fields.append(('value', _("Value")))
         fields.append(('where', None))
@@ -137,12 +136,7 @@ class POSHardwareList(GenList):
 
 class POSHardwareCreate(GenCreate):
     model = POSHardware
-    form_class = POSHardwareFormCreate
-
-    def get_form(self, *args, **kwargs):
-        form = super(POSHardwareCreate, self).get_form(*args, **kwargs)
-        form.fields["key"].initial = ''.join(random.SystemRandom().choice(string.ascii_letters + string.digits) for _ in range(32))
-        return form
+    form_class = POSHardwareForm
 
 
 class POSHardwareCreateModal(GenCreateModal, POSHardwareCreate):
@@ -198,6 +192,30 @@ class POSHardwareForeign(GenForeignKey):
         return queryset
 
 
+class POSHardwareProfiles(GenForeignKey):
+    model = POSHardware
+
+    def get_label(self, pk):
+        return _("Use config field")
+
+    def get(self, request, *args, **kwargs):
+        # Build answer
+        answer = [{'id': None, 'label': '---------'}]
+
+        # This will be the last option
+        answer.append({'id': 'CONFIG', 'label': _('Use config field')})
+
+        # Convert the answer to JSON
+        json_answer = json.dumps({
+            'clear': [],
+            'rows': answer,
+            'readonly': [],
+        })
+
+        # Return response
+        return HttpResponse(json_answer, content_type='application/json')
+
+
 # ###########################################
 # POS
 class POSList(GenList):
@@ -207,12 +225,7 @@ class POSList(GenList):
 
 class POSCreate(GenCreate):
     model = POS
-    form_class = POSFormCreate
-
-    def get_form(self, *args, **kwargs):
-        form = super(POSCreate, self).get_form(*args, **kwargs)
-        form.fields["key"].initial = ''.join(random.SystemRandom().choice(string.ascii_letters + string.digits) for _ in range(32))
-        return form
+    form_class = POSForm
 
 
 class POSCreateModal(GenCreateModal, POSCreate):
