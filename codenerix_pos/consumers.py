@@ -130,9 +130,12 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
         Called when a message is received with decoded JSON content
         """
 
-        self.debug("{} - Receive: {} (ref:{}) - {}".format(pos.name.encode('ascii', 'ignore'), message, ref, pos.uuid), color="cyan")
-
+        # Get action
         action = message.get('action', None)
+
+        # Show the message we got
+        if action != 'pingdog':
+            self.debug("{} - Receive: {} (ref:{}) - {}".format(pos.name.encode('ascii', 'ignore'), message, ref, pos.uuid), color="cyan")
 
         # Check the action that it is requesting
         if action == 'get_config':
