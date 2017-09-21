@@ -181,6 +181,8 @@ class POSConsumer(JsonWebsocketConsumer, Debugger):
             super(POSConsumer, self).send({'message': json.dumps({'action': 'pong', 'ref': ref})})
         elif action == 'pong':
             self.debug("{} - Got PONG {} (ref:{}) - {}".format(pos.name.encode('ascii', 'ignore'), message.get('ref', '-'), ref, pos.uuid), color='white')
+        elif action == 'pingdog':
+            super(POSConsumer, self).send({'message': json.dumps({'action': 'pongdog', 'ref': ref})})
         elif action == 'error':
             uid = message.get('uuid', None)
             msg = message.get('error', 'No error')
