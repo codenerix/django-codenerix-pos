@@ -145,7 +145,7 @@ class POSHardware(CodenerixModel):
     config = JSONField(_("config"), blank=True, null=True)
     value = JSONField(_("config"), blank=True, null=True)
 
-    class Meta:
+    class Meta(CodenerixModel.Meta):
         unique_together = ('pos', 'kind', 'name')
 
     def __unicode__(self):
