@@ -24,7 +24,7 @@ from django.views.generic import TemplateView
 from .views import POSZoneList, POSZoneCreate, POSZoneCreateModal, POSZoneUpdate, POSZoneUpdateModal, POSZoneDelete, POSZoneDetails
 from .views import POSHardwareList, POSHardwareCreate, POSHardwareCreateModal, POSHardwareUpdate, POSHardwareUpdateModal, POSHardwareDelete, POSHardwareSubList, POSHardwareDetails, POSHardwareDetailModal
 from .views import POSHardwareForeign, POSHardwareProfiles
-from .views import POSList, POSCreate, POSCreateModal, POSUpdate, POSUpdateModal, POSDelete, POSSubList, POSDetails, POSDetailModal
+from .views import POSList, POSCreate, POSCreateModal, POSUpdate, POSUpdateModal, POSDelete, POSSubList, POSDetails, POSDetailModal, POSCommits
 from .views import POSSlotList, POSSlotCreate, POSSlotCreateModal, POSSlotUpdate, POSSlotUpdateModal, POSSlotDelete, POSSlotSubList, POSSlotDetails, POSSlotDetailModal
 from .views import POSPlantList, POSPlantCreate, POSPlantCreateModal, POSPlantUpdate, POSPlantUpdateModal, POSPlantDelete, POSPlantDetails
 from .views import POSProductList, POSProductCreate, POSProductCreateModal, POSProductUpdate, POSProductUpdateModal, POSProductDelete, POSProductSubList, POSProductDetails, POSProductDetailModal
@@ -96,6 +96,7 @@ urlpatterns = [
     url(r'^poss/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/edit$', POSUpdateModal.as_view(), name='CDNX_poss_sublist_edit'),
     url(r'^poss/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/editmodal$', POSUpdateModal.as_view(), name='CDNX_poss_sublist_editmodal'),
     url(r'^poss/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/delete$', POSDelete.as_view(), name='CDNX_poss_sublist_delete'),
+    url(r'^poss/commits/(?P<search>[\w\W]+|\*)$', POSCommits.as_view(), name='CDNX_poss_commits'),
 
 
     url(r'^posslots$', POSSlotList.as_view(), name='CDNX_posslots_list'),

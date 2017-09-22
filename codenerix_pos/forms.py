@@ -23,7 +23,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from codenerix.forms import GenModelForm
 from codenerix_extensions.helpers import get_external_model
-from codenerix.widgets import MultiStaticSelect, DynamicSelect
+from codenerix.widgets import MultiStaticSelect
 
 from .models import POSZone, POSHardware, POS, POSSlot, POSPlant, POSProduct, POSOperator
 
@@ -134,14 +134,18 @@ class POSForm(GenModelForm):
     class Meta:
         model = POS
         exclude = ['payments', 'uuid']
+        autofill = {
+            'commit': ['select', 3, 'CDNX_poss_commits'],
+        }
 
     def __groups__(self):
         return [
             (
                 _('Details'), 12,
-                ['name', 4],
-                ['zone', 4],
-                ['hardware', 4],
+                ['name', 3],
+                ['zone', 3],
+                ['commit', 6],
+                ['hardware', 12],
             )
         ]
 
