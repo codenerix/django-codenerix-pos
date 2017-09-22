@@ -203,9 +203,9 @@ class POSHardwareProfiles(GenForeignKey):
         else:
             profiles = getattr(settings, 'POSHARDWARE_PROFILE', {})
             for kind in profiles:
-                for hw in profiles[kind]:
-                    if hw == pk:
-                        name = hw.get('name', None)
+                for hwkey in profiles[kind]:
+                    if hwkey == pk:
+                        name = profiles[kind][hwkey].get('name', None)
                         if name:
                             return name
                         else:
@@ -308,7 +308,6 @@ class POSCommits(GenForeignKey):
             count = 0
             for commit in data:
                 hashkey = commit.get('sha', None)
-                print(hashkey)
                 if hashkey:
                     answer.append({'id': hashkey, 'label': hashkey})
                     count += 1
