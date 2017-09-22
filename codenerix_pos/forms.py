@@ -88,7 +88,7 @@ class POSHardwareForm(GenModelForm):
         model = POSHardware
         exclude = ['value']
         autofill = {
-            'profile': ['select', 3, 'CDNX_poshardwares_profiles'],
+            'profile': ['select', 3, 'CDNX_poshardwares_profiles', 'kind'],
         }
 
     def __groups__(self):
