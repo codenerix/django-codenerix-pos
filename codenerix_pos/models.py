@@ -172,7 +172,7 @@ class POSHardware(CodenerixModel):
         if self.profile == 'CONFIG':
             return self.config
         else:
-            return getattr(settings, 'POSHARDWARE_PROFILE', {}).get(self.profile, {})
+            return getattr(settings, 'POSHARDWARE_PROFILE', {}).get(self.kind, {}).get(self.profile, {})
 
     def save(self, *args, **kwargs):
         if 'doreset' in kwargs:
