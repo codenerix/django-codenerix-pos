@@ -29,6 +29,7 @@ from django.db import models
 from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
+from django.conf import settings
 
 from jsonfield import JSONField
 
@@ -168,7 +169,10 @@ class POSHardware(CodenerixModel):
         return fields
 
     def get_config(self):
-        return json.loads(self.config)
+        if self.profile == 'CONFIG':
+            return self.config
+        else:
+            return getattr(settings, 'POSHARDWARE_PROFILE', {}).get(self.profile, {})
 
     def save(self, *args, **kwargs):
         if 'doreset' in kwargs:

@@ -28,6 +28,7 @@ from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 from django.views.generic import View
 from django.db.models import Count
+from django.conf import settings
 
 from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUpdateModal, GenDelete, GenDetail, GenDetailModal, GenForeignKey
 from codenerix_extensions.views import GenCreateBridge, GenUpdateBridge
@@ -204,6 +205,9 @@ class POSHardwareProfiles(GenForeignKey):
 
         # This will be the last option
         answer.append({'id': 'CONFIG', 'label': _('Use config field')})
+        profiles = getattr(settings, 'POSHARDWARE_PROFILE', {}).get(self.profile, {})
+        for key in profiles:
+            answer.append({'id': key, 'label': profiles[key].get('name', key)})
 
         # Convert the answer to JSON
         json_answer = json.dumps({
