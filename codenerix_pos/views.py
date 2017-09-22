@@ -308,13 +308,16 @@ class POSCommits(GenForeignKey):
             count = 0
             for commit in data:
                 hashkey = commit.get('sha', None)
+                print(hashkey)
                 if hashkey:
                     answer.append({'id': hashkey, 'label': hashkey})
                     count += 1
                     if count == 10:
                         break
 
-        answer = [{'id': None, 'label': '...'}]
+        # Add one last option saying it has more
+        if len(data)>10:
+            answer.append({'id': None, 'label': '...'})
 
         # Convert the answer to JSON
         json_answer = json.dumps({
