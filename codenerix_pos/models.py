@@ -167,6 +167,9 @@ class POSHardware(CodenerixModel):
         fields.append(('value', _("Value")))
         return fields
 
+    def get_config(self):
+        return json.loads(self.config)
+
     def save(self, *args, **kwargs):
         if 'doreset' in kwargs:
             doreset = kwargs.pop('doreset')
