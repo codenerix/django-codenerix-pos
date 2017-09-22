@@ -233,7 +233,7 @@ class POS(CodenerixModel):
     zone = models.ForeignKey(POSZone, related_name='poss', verbose_name=_("Zone"))
     payments = models.ManyToManyField(PaymentRequest, related_name='poss', verbose_name=_("Payments"), blank=True)
     channel = models.CharField(_("Channel"), max_length=50, blank=True, null=True, unique=True, editable=False)
-    commit = models.CharField(_("Commit"), max_length=40, blank=True, null=True, default="LATEST", editable=False)
+    commit = models.CharField(_("Commit"), max_length=40, blank=True, null=True, default="LATEST")
     # Hardware that can use
     hardware = models.ManyToManyField(POSHardware, related_name='poss', verbose_name=_("Hardware it can use"), blank=True)
 

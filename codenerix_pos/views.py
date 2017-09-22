@@ -269,6 +269,31 @@ class POSDetailModal(GenDetailModal, POSDetails):
     pass
 
 
+class POSCommits(GenForeignKey):
+    model = POS
+
+    def get_label(self, pk):
+        return _("Latest configuration")
+
+    def get(self, request, *args, **kwargs):
+        # posclient = "https://api.github.com/repos/centrologic/django-codenerix-pos-client/commits"
+        # Build answer
+        answer = [{'id': None, 'label': '---------'}]
+
+        # This will be the last option
+        answer.append({'id': 'LATEST', 'label': _('Latest configuration')})
+
+        # Convert the answer to JSON
+        json_answer = json.dumps({
+            'clear': [],
+            'rows': answer,
+            'readonly': [],
+        })
+
+        # Return response
+        return HttpResponse(json_answer, content_type='application/json')
+
+
 # ###########################################
 # POSSlot
 class POSSlotList(GenList):
