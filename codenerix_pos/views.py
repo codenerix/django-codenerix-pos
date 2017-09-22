@@ -203,10 +203,12 @@ class POSHardwareProfiles(GenForeignKey):
     def get(self, request, *args, **kwargs):
         # Build answer
         answer = [{'id': None, 'label': '---------'}]
-
+        filterstxt = request.GET.get('filter', '{}')
+        filters = json.loads(filterstxt)
+        kind = filters.get('kind', None)
         # This will be the last option
         answer.append({'id': 'CONFIG', 'label': _('Use config field')})
-        profiles = getattr(settings, 'POSHARDWARE_PROFILE', {}).get(self.profile, {})
+        profiles = getattr(settings, 'POSHARDWARE_PROFILE', {}).get(kind, {})
         for key in profiles:
             answer.append({'id': key, 'label': profiles[key].get('name', key)})
 
