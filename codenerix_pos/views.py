@@ -205,7 +205,7 @@ class POSHardwareProfiles(GenForeignKey):
             for kind in profiles:
                 for hw in profiles[kind]:
                     if hw == pk:
-                        name = hw.get('name', None)
+                        name = hw.get_config('name', None)
                         if name:
                             return name
                         else:
