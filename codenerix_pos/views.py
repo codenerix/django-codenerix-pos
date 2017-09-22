@@ -198,7 +198,18 @@ class POSHardwareProfiles(GenForeignKey):
     model = POSHardware
 
     def get_label(self, pk):
-        return _("Use config field")
+        if pk == 'CONFIG':
+            return _("Use config field")
+        else:
+            profiles = getattr(settings, 'POSHARDWARE_PROFILE', {})
+            for kind in profiles:
+                for hw in profiles[kind]:
+                    if hw == pk:
+                        name = hw.get('name', None)
+                        if name:
+                            return name
+                        else:
+                            return pk
 
     def get(self, request, *args, **kwargs):
         # Build answer
@@ -271,6 +282,7 @@ class POSDetails(GenDetail):
 class POSDetailModal(GenDetailModal, POSDetails):
     pass
 
+
 class POSCommits(GenForeignKey):
     model = POS
 
@@ -298,9 +310,11 @@ class POSCommits(GenForeignKey):
                 hashkey = commit.get('sha', None)
                 if hashkey:
                     answer.append({'id': hashkey, 'label': hashkey})
-                    count+=1
+                    count += 1
                     if count == 10:
                         break
+
+        answer = [{'id': None, 'label': '...'}]
 
         # Convert the answer to JSON
         json_answer = json.dumps({
