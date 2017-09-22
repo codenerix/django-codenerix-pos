@@ -20,6 +20,7 @@
 
 import json
 import hashlib
+import requests
 
 from django.db.models import Q
 from django.db.models.fields import FieldDoesNotExist
@@ -268,20 +269,36 @@ class POSDetails(GenDetail):
 class POSDetailModal(GenDetailModal, POSDetails):
     pass
 
-
 class POSCommits(GenForeignKey):
     model = POS
 
     def get_label(self, pk):
-        return _("Latest configuration")
+        if pk == 'LATEST':
+            return _("Latest configuration")
+        else:
+            return pk
 
     def get(self, request, *args, **kwargs):
-        # posclient = "https://api.github.com/repos/centrologic/django-codenerix-pos-client/commits"
         # Build answer
         answer = [{'id': None, 'label': '---------'}]
 
         # This will be the last option
         answer.append({'id': 'LATEST', 'label': _('Latest configuration')})
+
+        # Get all hashes
+        url = "https://api.github.com/repos/centrologic/django-codenerix-pos-client/commits"
+        r = requests.get(url, params={})
+        if not r.raise_for_status():
+            # Read the answer$
+            data = r.json()
+            count = 0
+            for commit in data:
+                hashkey = commit.get('sha', None)
+                if hashkey:
+                    answer.append({'id': hashkey, 'label': hashkey})
+                    count+=1
+                    if count == 10:
+                        break
 
         # Convert the answer to JSON
         json_answer = json.dumps({
