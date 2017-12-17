@@ -96,8 +96,8 @@ class POSPlant(CodenerixModel):
     """
     Plant
     """
-    corporate_image = models.ForeignKey(CorporateImage, related_name='posplants', verbose_name=_("Corporate image"), blank=False, null=False)
-    billing_series = models.ForeignKey(BillingSeries, related_name='posplants', verbose_name='Billing series', blank=False, null=False)
+    corporate_image = models.ForeignKey(CorporateImage, related_name='posplants', verbose_name=_("Corporate image"), blank=False, null=False, on_delete=models.CASCADE)
+    billing_series = models.ForeignKey(BillingSeries, related_name='posplants', verbose_name='Billing series', blank=False, null=False, on_delete=models.CASCADE)
     name = models.CharField(_("Name"), max_length=250, blank=False, null=False, unique=True)
 
     def __unicode__(self):
@@ -116,7 +116,7 @@ class POSZone(CodenerixModel):
     """
     Zone
     """
-    plant = models.ForeignKey(POSPlant, related_name='zones', verbose_name=_("Plant"), blank=False, null=False)
+    plant = models.ForeignKey(POSPlant, related_name='zones', verbose_name=_("Plant"), blank=False, null=False, on_delete=models.CASCADE)
     name = models.CharField(_("Name"), max_length=250, blank=False, null=False, unique=True)
 
     def __unicode__(self):
@@ -136,7 +136,7 @@ class POSHardware(CodenerixModel):
     """
     Hardware
     """
-    pos = models.ForeignKey("POS", related_name='hardwares', verbose_name=_("POS"), blank=True, null=True)
+    pos = models.ForeignKey("POS", related_name='hardwares', verbose_name=_("POS"), blank=True, null=True, on_delete=models.CASCADE)
     kind = models.CharField(_("Kind"), max_length=6, choices=KIND_POSHARDWARE, blank=False, null=False)
     name = models.CharField(_("Name"), max_length=250, blank=False, null=False)
     enable = models.BooleanField(_('Enable'), default=True)
@@ -230,7 +230,7 @@ class POS(CodenerixModel):
     name = models.CharField(_("Name"), max_length=250, blank=False, null=False, unique=True)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     key = models.CharField(_("Key"), max_length=32, blank=False, null=False, unique=True, editable=False, default=keymaker)
-    zone = models.ForeignKey(POSZone, related_name='poss', verbose_name=_("Zone"))
+    zone = models.ForeignKey(POSZone, related_name='poss', verbose_name=_("Zone"), on_delete=models.CASCADE)
     payments = models.ManyToManyField(PaymentRequest, related_name='poss', verbose_name=_("Payments"), blank=True)
     channel = models.CharField(_("Channel"), max_length=50, blank=True, null=True, unique=True, editable=False)
     commit = models.CharField(_("Commit"), max_length=40, blank=True, null=True, default="LATEST")
@@ -326,7 +326,7 @@ class POSSlot(CodenerixModel):
     '''
     Slots for Point of Service
     '''
-    zone = models.ForeignKey(POSZone, related_name='slots', verbose_name=_("Zone"))
+    zone = models.ForeignKey(POSZone, related_name='slots', verbose_name=_("Zone"), on_delete=models.CASCADE)
     name = models.CharField(_("Name"), max_length=250, blank=False, null=False, unique=True)
     # orders = models.ManyToManyField(SalesOrder, related_name='slots', editable=False, verbose_name=_("Orders"))
     pos_x = models.IntegerField(_('Pos X'), null=True, blank=True, default=None, editable=False)
@@ -350,8 +350,8 @@ class POSProduct(CodenerixModel):
     """
     Salable products in the POS
     """
-    pos = models.ForeignKey(POS, related_name='posproducts', verbose_name=_("POS"))
-    product = models.ForeignKey(ProductFinal, related_name='posproducts', verbose_name=_("Product"))
+    pos = models.ForeignKey(POS, related_name='posproducts', verbose_name=_("POS"), on_delete=models.CASCADE)
+    product = models.ForeignKey(ProductFinal, related_name='posproducts', verbose_name=_("Product"), on_delete=models.CASCADE)
     enable = models.BooleanField(_('Enable'), default=True)
 
     class Meta(CodenerixModel.Meta):
@@ -375,8 +375,8 @@ class POSLog(CodenerixModel):
     """
     LOG for POS
     """
-    pos = models.ForeignKey(POS, related_name='logs', verbose_name=_("POS"), editable=False, null=True)
-    poshw = models.ForeignKey(POSHardware, related_name='logs', verbose_name=_("POS"), editable=False, null=True)
+    pos = models.ForeignKey(POS, related_name='logs', verbose_name=_("POS"), editable=False, null=True, on_delete=models.CASCADE)
+    poshw = models.ForeignKey(POSHardware, related_name='logs', verbose_name=_("POS"), editable=False, null=True, on_delete=models.CASCADE)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     log = JSONField(_("LOG"), blank=True, null=True)
 
