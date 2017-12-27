@@ -11,7 +11,7 @@ class POSAuth(ModelBackend):
     Authentication system based on a Token key
     '''
 
-    def authenticate(self, username=None, pincode=None, PointOfSales=None):
+    def authenticate(self, request=None, username=None, pincode=None, PointOfSales=None):
         try:
             # Get the requested username
             user = User.objects.get(username=username)
