@@ -2,9 +2,10 @@ var uuid_websocket = undefined;
 var key_websocket = undefined;
 var commit_websocket = undefined;
 $(function() {
-    // When we're using HTTPS, use WSS too.
-    var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-    var ws_path = ws_scheme + '://127.0.0.1:8080/codenerix_pos_client/';
+    // When we're using HTTPS, use WSS too -> POSClient doesn't server HTTPS, we have decide to force it to use HTTP always
+    // var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+    // var ws_path = ws_scheme + '://127.0.0.1:8080/codenerix_pos_client/';
+    var ws_path = 'ws://127.0.0.1:8080/codenerix_pos_client/';
     // console.log("Connecting to " + ws_path)
     var socket = new WebSocket(ws_path);
     if (socket) {
