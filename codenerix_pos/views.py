@@ -664,7 +664,7 @@ class POSGroupProductSubList(GenList):
 
 class POSGroupProductDetails(GenDetail):
     model = POSGroupProduct
-    groups = POSGroupProductForm.__groups_details__()
+    # groups = POSGroupProductForm.__groups_details__()
 
 
 class POSGroupProductDetailModal(GenDetailModal, POSGroupProductDetails):
