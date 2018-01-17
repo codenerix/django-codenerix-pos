@@ -44,6 +44,7 @@ from codenerix_extensions.lib.cryptography import AESCipher
 from codenerix.models import GenInterface
 from codenerix.models_people import GenRole
 from codenerix_extensions.helpers import get_external_method
+from codenerix_storages.models import Storage, StorageZone
 from codenerix_pos.settings import CDNX_POS_PERMISSIONS
 
 
@@ -223,6 +224,32 @@ class POSHardware(CodenerixModel):
         self.pos.send(data, ref, self.uuid)
 
 
+class POSGroupProduct(CodenerixModel):
+    """
+    Salable group products in the POS
+    """
+    name = models.CharField(_("Name"), max_length=80, null=False, blank=False)
+    enable = models.BooleanField(_('Enable'), default=True)
+
+    def __unicode__(self):
+        return self.__str__()
+
+    def __str__(self):
+        return u"{} ({})".format(smart_text(self.name), smart_text(self.enable))
+
+    def __fields__(self, info):
+        fields = []
+        fields.append(('name', _("Name")))
+        fields.append(('enable', _("Enable")))
+        return fields
+
+    def lock_delete(self):
+        if self.poss.exists():
+            return _("Cannot delete POS group product model, relationship between POS group product and POS")
+        else:
+            return super(POSGroupProduct, self).lock_delete()
+
+
 class POS(CodenerixModel):
     '''
     Point of Service
@@ -231,11 +258,16 @@ class POS(CodenerixModel):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     key = models.CharField(_("Key"), max_length=32, blank=False, null=False, unique=True, editable=False, default=keymaker)
     zone = models.ForeignKey(POSZone, related_name='poss', verbose_name=_("Zone"), on_delete=models.CASCADE)
+    group_product = models.ForeignKey(POSGroupProduct, related_name='poss', verbose_name=_("Group product"), on_delete=models.CASCADE)
     payments = models.ManyToManyField(PaymentRequest, related_name='poss', verbose_name=_("Payments"), blank=True)
     channel = models.CharField(_("Channel"), max_length=50, blank=True, null=True, unique=True, editable=False)
     commit = models.CharField(_("Commit"), max_length=40, blank=True, null=True, default="LATEST")
     # Hardware that can use
-    hardware = models.ManyToManyField(POSHardware, related_name='poss', verbose_name=_("Hardware it can use"), blank=True)
+    hardware = models.ManyToManyField(POSHardware, related_name='poss', verbose_name=_("Hardware it can use"), blank=True, null=True)
+    # Storage stock
+    storage_stock = models.ManyToManyField(Storage, related_name='poss_storage_stock', verbose_name=_("Storages where the stock is subtracted"), blank=True, null=True)
+    # Storate query
+    storage_query = models.ManyToManyField(Storage, related_name='poss_storage_query', verbose_name=_("Storages where you can consult"), blank=True, null=True)
 
     def __unicode__(self):
         return self.__str__()
@@ -251,6 +283,8 @@ class POS(CodenerixModel):
         fields.append(('key', _("Key")))
         fields.append(('channel', _("Channel")))
         fields.append(('hardware', _("Hardware")))
+        fields.append(('storage_stock', _("Storages where the stock is subtracted")))
+        fields.append(('storage_query', _("Storages where you can consult")))
         fields.append(('commit', _("Commit")))
         return fields
 
@@ -350,23 +384,23 @@ class POSProduct(CodenerixModel):
     """
     Salable products in the POS
     """
-    pos = models.ForeignKey(POS, related_name='posproducts', verbose_name=_("POS"), on_delete=models.CASCADE)
-    product = models.ForeignKey(ProductFinal, related_name='posproducts', verbose_name=_("Product"), on_delete=models.CASCADE)
+    group_product = models.ForeignKey(POSGroupProduct, related_name='posproducts', verbose_name=_("POS"), on_delete=models.CASCADE)
+    product_final = models.ForeignKey(ProductFinal, related_name='posproducts', verbose_name=_("Product"), on_delete=models.CASCADE)
     enable = models.BooleanField(_('Enable'), default=True)
 
     class Meta(CodenerixModel.Meta):
-        unique_together = (("pos", "product"))
+        unique_together = (("group_product", "product_final"))
 
     def __unicode__(self):
         return self.__str__()
 
     def __str__(self):
-        return u"{} {}".format(smart_text(self.pos), smart_text(self.product))
+        return u"{} {}".format(smart_text(self.pos), smart_text(self.product_final))
 
     def __fields__(self, info):
         fields = []
         fields.append(('pos', _("POS")))
-        fields.append(('product', _("Product")))
+        fields.append(('product_final', _("Product")))
         fields.append(('enable', _("Enable")))
         return fields
 
@@ -452,6 +486,7 @@ class POSOperator(GenRole, CodenerixModel):
 # operators
 class GenPOSOperator(GenInterface, ABSTRACT_GenPOSOperator):  # META: Abstract class
     pos_operator = models.OneToOneField(POSOperator, related_name='external', verbose_name=_("POS Operator"), null=True, on_delete=models.SET_NULL, blank=True)
+    zone = models.ManyToManyField(StorageZone, related_name='external', verbose_name=_("Storage zone"), blank=True, null=True)
 
     class Meta(GenInterface.Meta, ABSTRACT_GenPOSOperator.Meta):
         abstract = True
