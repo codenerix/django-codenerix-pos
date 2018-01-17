@@ -34,8 +34,8 @@ from django.conf import settings
 from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUpdateModal, GenDelete, GenDetail, GenDetailModal, GenForeignKey
 from codenerix_extensions.views import GenCreateBridge, GenUpdateBridge
 
-from .models import POSZone, POSHardware, POS, POSSlot, POSPlant, POSProduct, POSLog, POSOperator
-from .forms import POSZoneForm, POSHardwareForm, POSForm, POSSlotForm, POSPlantForm, POSProductForm, POSOperatorForm
+from .models import POSZone, POSHardware, POS, POSSlot, POSPlant, POSProduct, POSLog, POSOperator, POSGroupProduct
+from .forms import POSZoneForm, POSHardwareForm, POSForm, POSSlotForm, POSPlantForm, POSProductForm, POSOperatorForm, POSGroupProductForm
 
 
 # ###########################################
@@ -315,7 +315,7 @@ class POSCommits(GenForeignKey):
                         break
 
         # Add one last option saying it has more
-        if len(data)>10:
+        if len(data) > 10:
             answer.append({'id': None, 'label': '...'})
 
         # Convert the answer to JSON
@@ -619,3 +619,53 @@ class POSSession(View):
         request.session['POS_client_COMMIT'] = commit
         json_answer = json.dumps(context)
         return HttpResponse(json_answer, content_type='application/json')
+
+
+# ###########################################
+# POSGroupProduct
+class POSGroupProductList(GenList):
+    model = POSGroupProduct
+    extra_context = {'menu': ['pos', 'POSGroupProduct'], 'bread': [_('POS'), _('POSGroupProduct')]}
+
+
+class POSGroupProductCreate(GenCreate):
+    model = POSGroupProduct
+    form_class = POSGroupProductForm
+
+
+class POSGroupProductCreateModal(GenCreateModal, POSGroupProductCreate):
+    pass
+
+
+class POSGroupProductUpdate(GenUpdate):
+    model = POSGroupProduct
+    form_class = POSGroupProductForm
+
+
+class POSGroupProductUpdateModal(GenUpdateModal, POSGroupProductUpdate):
+    pass
+
+
+class POSGroupProductDelete(GenDelete):
+    model = POSGroupProduct
+
+
+class POSGroupProductSubList(GenList):
+    model = POSGroupProduct
+    show_details = False
+    extra_context = {'menu': ['pos', 'POSGroupProduct'], 'bread': [_('POS'), _('POSGroupProduct')]}
+
+    def __limitQ__(self, info):
+        limit = {}
+        pk = info.kwargs.get('pk', None)
+        limit['link'] = Q(xxxxxxx__pk=pk)
+        return limit
+
+
+class POSGroupProductDetails(GenDetail):
+    model = POSGroupProduct
+    groups = POSGroupProductForm.__groups_details__()
+
+
+class POSGroupProductDetailModal(GenDetailModal, POSGroupProductDetails):
+    pass

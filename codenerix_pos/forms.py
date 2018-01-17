@@ -25,7 +25,7 @@ from codenerix.forms import GenModelForm
 from codenerix_extensions.helpers import get_external_model
 from codenerix.widgets import MultiStaticSelect
 
-from .models import POSZone, POSHardware, POS, POSSlot, POSPlant, POSProduct, POSOperator
+from .models import POSZone, POSHardware, POS, POSSlot, POSPlant, POSProduct, POSOperator, POSGroupProduct
 
 
 class POSPlantForm(GenModelForm):
@@ -275,3 +275,18 @@ class POSOperatorForm(GenModelForm):
             del cleaned_data['password1']
             del cleaned_data['password2']
             raise forms.ValidationError(_("Passwords do not match"))
+
+
+class POSGroupProductForm(GenModelForm):
+    class Meta:
+        model = POSGroupProduct
+        exclude = []
+
+    def __groups__(self):
+        return [
+            (
+                _('Details', 12)
+                ['name', 6],
+                ['enable', 6],
+            )
+        ]
