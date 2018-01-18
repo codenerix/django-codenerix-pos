@@ -625,7 +625,7 @@ class POSSession(View):
 # POSGroupProduct
 class POSGroupProductList(GenList):
     model = POSGroupProduct
-    extra_context = {'menu': ['pos', 'POSGroupProduct'], 'bread': [_('POS'), _('POSGroupProduct')]}
+    extra_context = {'menu': ['pos', 'posgroupproduct'], 'bread': [_('POS'), _('POSGroupProduct')]}
 
 
 class POSGroupProductCreate(GenCreate):

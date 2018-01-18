@@ -152,19 +152,19 @@ urlpatterns = [
 
 
     # POSGroupProduct
-    url(r'^posgroupproducts$', POSGroupProductList.as_view(), name='posgroupproducts_list'),
-    url(r'^posgroupproducts/add$', POSGroupProductCreate.as_view(), name='posgroupproducts_add'),
-    url(r'^posgroupproducts/addmodal$', POSGroupProductCreateModal.as_view(), name='posgroupproducts_addmodal'),
-    url(r'^posgroupproducts/(?P<pk>\w+)$', POSGroupProductDetails.as_view(), name='posgroupproducts_details'),
-    url(r'^posgroupproducts/(?P<pk>\w+)/edit$', POSGroupProductUpdate.as_view(), name='posgroupproducts_edit'),
-    url(r'^posgroupproducts/(?P<pk>\w+)/editmodal$', POSGroupProductUpdateModal.as_view(), name='posgroupproducts_editmodal'),
-    url(r'^posgroupproducts/(?P<pk>\w+)/delete$', POSGroupProductDelete.as_view(), name='posgroupproducts_delete'),
-    url(r'^posgroupproducts/(?P<pk>\w+)/sublist$', POSGroupProductSubList.as_view(), name='posgroupproducts_sublist'),
-    url(r'^posgroupproducts/(?P<pk>\w+)/sublist/add$', POSGroupProductCreateModal.as_view(), name='posgroupproducts_sublist_add'),
-    url(r'^posgroupproducts/(?P<pk>\w+)/sublist/addmodal$', POSGroupProductCreateModal.as_view(), name='posgroupproducts_sublist_addmodal'),
-    url(r'^posgroupproducts/(?P<cpk>\w+)/sublist/(?P<pk>\w+)$', POSGroupProductDetailModal.as_view(), name='posgroupproducts_sublist_details'),
-    url(r'^posgroupproducts/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/edit$', POSGroupProductUpdateModal.as_view(), name='posgroupproducts_sublist_edit'),
-    url(r'^posgroupproducts/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/editmodal$', POSGroupProductUpdateModal.as_view(), name='posgroupproducts_sublist_editmodal'),
-    url(r'^posgroupproducts/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/delete$', POSGroupProductDelete.as_view(), name='posgroupproducts_sublist_delete'),
+    url(r'^posgroupproducts$', POSGroupProductList.as_view(), name='CDNX_posgroupproducts_list'),
+    url(r'^posgroupproducts/add$', POSGroupProductCreate.as_view(), name='CDNX_posgroupproducts_add'),
+    url(r'^posgroupproducts/addmodal$', POSGroupProductCreateModal.as_view(), name='CDNX_posgroupproducts_addmodal'),
+    url(r'^posgroupproducts/(?P<pk>\w+)$', POSGroupProductDetails.as_view(), name='CDNX_posgroupproducts_details'),
+    url(r'^posgroupproducts/(?P<pk>\w+)/edit$', POSGroupProductUpdate.as_view(), name='CDNX_posgroupproducts_edit'),
+    url(r'^posgroupproducts/(?P<pk>\w+)/editmodal$', POSGroupProductUpdateModal.as_view(), name='CDNX_posgroupproducts_editmodal'),
+    url(r'^posgroupproducts/(?P<pk>\w+)/delete$', POSGroupProductDelete.as_view(), name='CDNX_posgroupproducts_delete'),
+    url(r'^posgroupproducts/(?P<pk>\w+)/sublist$', POSGroupProductSubList.as_view(), name='CDNX_posgroupproducts_sublist'),
+    url(r'^posgroupproducts/(?P<pk>\w+)/sublist/add$', POSGroupProductCreateModal.as_view(), name='CDNX_posgroupproducts_sublist_add'),
+    url(r'^posgroupproducts/(?P<pk>\w+)/sublist/addmodal$', POSGroupProductCreateModal.as_view(), name='CDNX_posgroupproducts_sublist_addmodal'),
+    url(r'^posgroupproducts/(?P<cpk>\w+)/sublist/(?P<pk>\w+)$', POSGroupProductDetailModal.as_view(), name='CDNX_posgroupproducts_sublist_details'),
+    url(r'^posgroupproducts/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/edit$', POSGroupProductUpdateModal.as_view(), name='CDNX_posgroupproducts_sublist_edit'),
+    url(r'^posgroupproducts/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/editmodal$', POSGroupProductUpdateModal.as_view(), name='CDNX_posgroupproducts_sublist_editmodal'),
+    url(r'^posgroupproducts/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/delete$', POSGroupProductDelete.as_view(), name='CDNX_posgroupproducts_sublist_delete'),
 
 ]
