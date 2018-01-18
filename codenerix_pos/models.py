@@ -384,7 +384,7 @@ class POSProduct(CodenerixModel):
     """
     Salable products in the POS
     """
-    group_product = models.ForeignKey(POSGroupProduct, related_name='posproducts', verbose_name=_("POS"), on_delete=models.CASCADE)
+    group_product = models.ForeignKey(POSGroupProduct, related_name='posproducts', verbose_name=_("Group Product"), on_delete=models.CASCADE)
     product_final = models.ForeignKey(ProductFinal, related_name='posproducts', verbose_name=_("Product"), on_delete=models.CASCADE)
     enable = models.BooleanField(_('Enable'), default=True)
 
@@ -395,11 +395,11 @@ class POSProduct(CodenerixModel):
         return self.__str__()
 
     def __str__(self):
-        return u"{} {}".format(smart_text(self.pos), smart_text(self.product_final))
+        return u"{} {}".format(smart_text(self.group_product), smart_text(self.product_final))
 
     def __fields__(self, info):
         fields = []
-        fields.append(('pos', _("POS")))
+        fields.append(('group_product', _("Group Product")))
         fields.append(('product_final', _("Product")))
         fields.append(('enable', _("Enable")))
         return fields

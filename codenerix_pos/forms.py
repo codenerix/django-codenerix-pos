@@ -201,8 +201,8 @@ class POSProductForm(GenModelForm):
         g = [
             (
                 _('Details'), 12,
-                ['pos', 6],
-                ['product', 6],
+                ['group_product', 6],
+                ['product_final', 6],
                 ['enable', 6],
             )
         ]
@@ -213,8 +213,8 @@ class POSProductForm(GenModelForm):
         g = [
             (
                 _('Details'), 12,
-                ['pos', 6],
-                ['product', 6],
+                ['group_product', 6],
+                ['product_final', 6],
                 ['enable', 6],
             )
         ]
@@ -285,7 +285,17 @@ class POSGroupProductForm(GenModelForm):
     def __groups__(self):
         return [
             (
-                _('Details', 12)
+                _('Details'), 12,
+                ['name', 6],
+                ['enable', 6],
+            )
+        ]
+
+    @staticmethod
+    def __groups_details__():
+        return [
+            (
+                _('Details'), 12,
                 ['name', 6],
                 ['enable', 6],
             )

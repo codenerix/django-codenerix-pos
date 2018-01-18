@@ -383,7 +383,7 @@ class POSSlotDetailModal(GenDetailModal, POSSlotDetails):
 class POSProductList(GenList):
     model = POSProduct
     extra_context = {'menu': ['pos', 'posproduct'], 'bread': [_('POS'), _('Product')]}
-    default_ordering = ["pos__name", ]
+    default_ordering = ["group_product__name", ]
 
 
 class POSProductCreate(GenCreate):
@@ -415,7 +415,7 @@ class POSProductSubList(GenList):
     def __limitQ__(self, info):
         limit = {}
         pk = info.kwargs.get('pk', None)
-        limit['link'] = Q(pos__pk=pk)
+        limit['link'] = Q(group_product__pk=pk)
         return limit
 
 
