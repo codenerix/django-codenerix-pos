@@ -22,10 +22,13 @@ import json
 import hashlib
 import requests
 
+from django.contrib.auth.decorators import login_required
+from django.db import IntegrityError, transaction
 from django.db.models import Q
 from django.db.models.fields import FieldDoesNotExist
 from django.forms.utils import ErrorList
 from django.http import HttpResponse
+from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.generic import View
 from django.db.models import Count
@@ -35,7 +38,7 @@ from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUp
 from codenerix_extensions.views import GenCreateBridge, GenUpdateBridge
 
 from .models import POSZone, POSHardware, POS, POSSlot, POSPlant, POSProduct, POSLog, POSOperator, POSGroupProduct
-from .forms import POSZoneForm, POSHardwareForm, POSForm, POSSlotForm, POSPlantForm, POSProductForm, POSOperatorForm, POSGroupProductForm
+from .forms import POSZoneForm, POSHardwareForm, POSForm, POSSlotForm, POSPlantForm, POSProductForm, POSProductFormGroup, POSOperatorForm, POSGroupProductForm
 
 
 # ###########################################
@@ -392,7 +395,26 @@ class POSProductCreate(GenCreate):
 
 
 class POSProductCreateModal(GenCreateModal, POSProductCreate):
-    pass
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        self.__group_pk = kwargs.get('pk', None)
+        if self.__group_pk:
+            self.form_class = POSProductFormGroup
+        return super(POSProductCreateModal, self).dispatch(*args, **kwargs)
+
+    def form_valid(self, form):
+        if self.__group_pk:
+            group_product = POSGroupProduct.objects.get(pk=self.__group_pk)
+            form.instance.group_product = group_product
+
+        try:
+            with transaction.atomic():
+                result = super(POSProductCreateModal, self).form_valid(form)
+        except IntegrityError as e:
+            errors = form._errors.setdefault("product_final", ErrorList())
+            errors.append(e)
+            return self.form_invalid(form)
+        return result
 
 
 class POSProductUpdate(GenUpdate):
@@ -417,6 +439,12 @@ class POSProductSubList(GenList):
         pk = info.kwargs.get('pk', None)
         limit['link'] = Q(group_product__pk=pk)
         return limit
+
+    def __fields__(self, info):
+        fields = []
+        fields.append(('product_final', _("Product")))
+        fields.append(('enable', _("Enable")))
+        return fields
 
 
 class POSProductDetails(GenDetail):
@@ -625,6 +653,7 @@ class POSSession(View):
 # POSGroupProduct
 class POSGroupProductList(GenList):
     model = POSGroupProduct
+    show_details = True
     extra_context = {'menu': ['pos', 'posgroupproduct'], 'bread': [_('POS'), _('POSGroupProduct')]}
 
 
@@ -664,7 +693,10 @@ class POSGroupProductSubList(GenList):
 
 class POSGroupProductDetails(GenDetail):
     model = POSGroupProduct
-    # groups = POSGroupProductForm.__groups_details__()
+    groups = POSGroupProductForm.__groups_details__()
+    tabs = [
+        {'id': 'products', 'name': _('Products'), 'ws': 'CDNX_posproducts_sublist', 'rows': 'base'},
+    ]
 
 
 class POSGroupProductDetailModal(GenDetailModal, POSGroupProductDetails):

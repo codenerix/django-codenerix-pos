@@ -221,6 +221,22 @@ class POSProductForm(GenModelForm):
         return g
 
 
+class POSProductFormGroup(GenModelForm):
+    class Meta:
+        model = POSProduct
+        exclude = ['group_product', ]
+
+    def __groups__(self):
+        g = [
+            (
+                _('Details'), 12,
+                ['product_final', 6],
+                ['enable', 6],
+            )
+        ]
+        return g
+
+
 class POSOperatorForm(GenModelForm):
     codenerix_external_field = forms.ModelChoiceField(
         label=POSOperator.foreignkey_external()['label'],
