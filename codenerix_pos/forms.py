@@ -26,6 +26,7 @@ from codenerix_extensions.helpers import get_external_model
 from codenerix.widgets import MultiStaticSelect
 
 from .models import POSZone, POSHardware, POS, POSSlot, POSPlant, POSProduct, POSOperator, POSGroupProduct
+from codenerix_storages.models import Storage
 
 
 class POSPlantForm(GenModelForm):
@@ -130,6 +131,22 @@ class POSForm(GenModelForm):
             attrs={'manytomany': True, }
         )
     )
+    storage_stock = forms.ModelMultipleChoiceField(
+        queryset=Storage.objects.all().order_by('name'),
+        label=_('Storages where the stock is subtracted'),
+        required=False,
+        widget=MultiStaticSelect(
+            attrs={'manytomany': True, }
+        )
+    )
+    storage_query = forms.ModelMultipleChoiceField(
+        queryset=Storage.objects.all().order_by('name'),
+        label=_('Storages where you can consult'),
+        required=False,
+        widget=MultiStaticSelect(
+            attrs={'manytomany': True, }
+        )
+    )
 
     class Meta:
         model = POS
@@ -145,7 +162,10 @@ class POSForm(GenModelForm):
                 ['name', 3],
                 ['zone', 3],
                 ['commit', 6],
+                ['group_product', 12],
                 ['hardware', 12],
+                ['storage_stock', 12],
+                ['storage_query', 12],
             )
         ]
 
@@ -158,7 +178,10 @@ class POSForm(GenModelForm):
                 ['uuid', 6],
                 ['key', 6],
                 ['zone', 6],
+                ['group_product', 12],
                 ['hardware', 6],
+                ['storage_stock', 12],
+                ['storage_query', 12],
                 ['payments', 6],
             )
         ]
