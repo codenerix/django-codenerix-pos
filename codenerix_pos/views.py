@@ -381,6 +381,26 @@ class POSSlotDetailModal(GenDetailModal, POSSlotDetails):
     pass
 
 
+class POSSlotForeign(GenForeignKey):
+    model = POSSlot
+    label = '{name}'
+
+    def get_foreign(self, queryset, search, filters):
+        # Filter with search string
+        qsobject = Q(name__icontains=search)
+
+        queryset = queryset.filter(qsobject)
+        
+        slot = filters.get('slot', None)
+
+        if slot:
+            queryset = queryset.filter(
+                Q(zone__poss__pk=slot)
+            )
+
+        return queryset
+
+
 # ###########################################
 # POSProduct
 class POSProductList(GenList):

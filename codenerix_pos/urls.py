@@ -32,6 +32,7 @@ from .views import POSLogList
 from .views import POSOperatorList, POSOperatorCreate, POSOperatorCreateModal, POSOperatorUpdate, POSOperatorUpdateModal, POSOperatorDelete, POSOperatorSubList, POSOperatorDetails, POSOperatorDetailModal
 from .views import POSSession
 from .views import POSGroupProductList, POSGroupProductCreate, POSGroupProductCreateModal, POSGroupProductUpdate, POSGroupProductUpdateModal, POSGroupProductDelete, POSGroupProductSubList, POSGroupProductDetails, POSGroupProductDetailModal
+from .views import POSSlotForeign
 
 
 class ExampleView(TemplateView):
@@ -114,7 +115,7 @@ urlpatterns = [
     url(r'^posslots/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/edit$', POSSlotUpdateModal.as_view(), name='CDNX_posslots_sublist_edit'),
     url(r'^posslots/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/editmodal$', POSSlotUpdateModal.as_view(), name='CDNX_posslots_sublist_editmodal'),
     url(r'^posslots/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/delete$', POSSlotDelete.as_view(), name='CDNX_posslots_sublist_delete'),
-
+    url(r'^posslots/foreign/(?P<search>[\w\W]+|\*)$', POSSlotForeign.as_view(), name='CDNX_posslots_foreign'),
 
     url(r'^posproducts$', POSProductList.as_view(), name='CDNX_posproducts_list'),
     url(r'^posproducts/add$', POSProductCreate.as_view(), name='CDNX_posproducts_add'),
