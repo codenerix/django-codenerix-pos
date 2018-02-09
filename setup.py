@@ -45,7 +45,7 @@ setup(
         'django-codenerix-payments',
         'django-codenerix-invoicing',
         'django-codenerix-corporate',
-        'channels',
+        'channels<2',
         'asgi_redis',
         'celery',
         'service_identity',
