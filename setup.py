@@ -49,5 +49,6 @@ setup(
         'asgi_redis',
         'celery',
         'service_identity',
+        'Twisted[tls,http2]',
     ]
 )
