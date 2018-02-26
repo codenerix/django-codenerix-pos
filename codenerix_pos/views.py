@@ -303,7 +303,7 @@ class POSCommits(GenForeignKey):
         answer.append({'id': 'LATEST', 'label': _('Latest configuration')})
 
         # Get all hashes
-        url = "https://api.github.com/repos/centrologic/django-codenerix-pos-client/commits"
+        url = "https://api.github.com/repos/codenerix/django-codenerix-pos-client/commits"
         r = requests.get(url, params={})
         if not r.raise_for_status():
             # Read the answer$
@@ -390,7 +390,7 @@ class POSSlotForeign(GenForeignKey):
         qsobject = Q(name__icontains=search)
 
         queryset = queryset.filter(qsobject)
-        
+
         slot = filters.get('slot', None)
 
         if slot:
