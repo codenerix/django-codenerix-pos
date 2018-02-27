@@ -487,7 +487,7 @@ class POSOperator(GenRole, CodenerixModel):
 class GenPOSOperator(GenInterface, ABSTRACT_GenPOSOperator):  # META: Abstract class
     pos_operator = models.OneToOneField(POSOperator, related_name='external', verbose_name=_("POS Operator"), null=True, on_delete=models.SET_NULL, blank=True)
     # Storage Zone Operable is used to specify from/to StorageZone the POSOperator can move stock
-    storage_zone_operable = models.ManyToManyField(StorageZone, related_name='external', verbose_name=_("Storage Zone Operable"), blank=True, null=True)
+    storage_zone_operable = models.ManyToManyField(StorageZone, related_name='external', verbose_name=_("Storage Zone Operable"), blank=True)
 
     class Meta(GenInterface.Meta, ABSTRACT_GenPOSOperator.Meta):
         abstract = True
