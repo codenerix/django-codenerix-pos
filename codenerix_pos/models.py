@@ -263,11 +263,11 @@ class POS(CodenerixModel):
     channel = models.CharField(_("Channel"), max_length=50, blank=True, null=True, unique=True, editable=False)
     commit = models.CharField(_("Commit"), max_length=40, blank=True, null=True, default="LATEST")
     # Hardware that can use
-    hardware = models.ManyToManyField(POSHardware, related_name='poss', verbose_name=_("Hardware it can use"), blank=True, null=True)
+    hardware = models.ManyToManyField(POSHardware, related_name='poss', verbose_name=_("Hardware it can use"), blank=True)
     # Storage stock
-    storage_stock = models.ManyToManyField(Storage, related_name='poss_storage_stock', verbose_name=_("Storages where the stock is subtracted"), blank=True, null=True)
+    storage_stock = models.ManyToManyField(Storage, related_name='poss_storage_stock', verbose_name=_("Storages where the stock is subtracted"), blank=True)
     # Storate query
-    storage_query = models.ManyToManyField(Storage, related_name='poss_storage_query', verbose_name=_("Storages where you can consult"), blank=True, null=True)
+    storage_query = models.ManyToManyField(Storage, related_name='poss_storage_query', verbose_name=_("Storages where you can consult"), blank=True)
 
     def __unicode__(self):
         return self.__str__()
