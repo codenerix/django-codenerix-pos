@@ -18,7 +18,7 @@ setup(
     license='Apache License Version 2.0',
     description='Codenerix Products is a module that enables CODENERIX to set Point of Services on serveral platforms in a general manner.',
     long_description=README,
-    url='https://github.com/centrologic/django-codenerix-pos',
+    url='https://github.com/codenerix/django-codenerix-pos',
     author=", ".join(codenerix_pos.__authors__),
     keywords=['django', 'codenerix', 'management', 'erp', 'pos'],
     platforms=['OS Independent'],
