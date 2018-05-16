@@ -268,6 +268,7 @@ class POS(CodenerixModel):
     storage_stock = models.ManyToManyField(Storage, related_name='poss_storage_stock', verbose_name=_("Storages where the stock is subtracted"), blank=True)
     # Storate query
     storage_query = models.ManyToManyField(Storage, related_name='poss_storage_query', verbose_name=_("Storages where you can consult"), blank=True)
+    print_unpaid = models.BooleanField(_('Print unpaid tickets'), default=True)
 
     def __unicode__(self):
         return self.__str__()
@@ -286,6 +287,7 @@ class POS(CodenerixModel):
         fields.append(('storage_stock', _("Storages where the stock is subtracted")))
         fields.append(('storage_query', _("Storages where you can consult")))
         fields.append(('commit', _("Commit")))
+        fields.append(('print_unpaid', _('Print unpaid tickets')))
         return fields
 
     def have_cash_drawer(self):
