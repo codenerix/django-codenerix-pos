@@ -38,6 +38,7 @@ from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUp
 from codenerix_extensions.views import GenCreateBridge, GenUpdateBridge
 
 from .models import POSZone, POSHardware, POS, POSSlot, POSPlant, POSProduct, POSLog, POSOperator, POSGroupProduct
+from .models import KIND_POSHARDWARE_CASH
 from .forms import POSZoneForm, POSHardwareForm, POSForm, POSSlotForm, POSPlantForm, POSProductForm, POSProductFormGroup, POSOperatorForm, POSGroupProductForm
 
 
@@ -721,3 +722,30 @@ class POSGroupProductDetails(GenDetail):
 
 class POSGroupProductDetailModal(GenDetailModal, POSGroupProductDetails):
     pass
+
+
+class OpenCashRegister(View):
+    def get(self, request, *args, **kwargs):
+        context = {}
+        context_hardware = {'ctx': 'opening...'}
+
+        uuid_pos = self.request.session.get('POS_client_UUID', None)
+        PDV = POS.objects.filter(uuid=uuid_pos).first()
+
+        if PDV:
+            box = POSHardware.objects.filter(
+                kind=KIND_POSHARDWARE_CASH,
+                poss=PDV
+            ).first()
+            if box:
+                try:
+                    box.send(context_hardware)
+                    context = {'msg': 'OK'}
+                except IOError as e:
+                    context['error'] = e
+            else:
+                context = {'error': _('Cash register do not found')}
+        else:
+            context['error'] = _("POS not found")
+        json_answer = json.dumps(context)
+        return HttpResponse(json_answer, content_type='application/json')

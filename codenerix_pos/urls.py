@@ -33,6 +33,7 @@ from .views import POSOperatorList, POSOperatorCreate, POSOperatorCreateModal, P
 from .views import POSSession
 from .views import POSGroupProductList, POSGroupProductCreate, POSGroupProductCreateModal, POSGroupProductUpdate, POSGroupProductUpdateModal, POSGroupProductDelete, POSGroupProductSubList, POSGroupProductDetails, POSGroupProductDetailModal
 from .views import POSSlotForeign
+from .views import OpenCashRegister
 
 
 class ExampleView(TemplateView):
@@ -168,4 +169,7 @@ urlpatterns = [
     url(r'^posgroupproducts/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/editmodal$', POSGroupProductUpdateModal.as_view(), name='CDNX_posgroupproducts_sublist_editmodal'),
     url(r'^posgroupproducts/(?P<cpk>\w+)/sublist/(?P<pk>\w+)/delete$', POSGroupProductDelete.as_view(), name='CDNX_posgroupproducts_sublist_delete'),
 
+    # Utilities
+    url(r'^open_cash_register$', OpenCashRegister.as_view(), name='CDNX_POS_open_cash_register'),
+    url(r'^open_cash_register/$', OpenCashRegister.as_view(), name='CDNX_POS_open_cash_register_'),
 ]
