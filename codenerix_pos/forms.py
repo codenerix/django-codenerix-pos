@@ -221,6 +221,9 @@ class POSProductForm(GenModelForm):
     class Meta:
         model = POSProduct
         exclude = []
+        autofill = {
+            'product_final': ['select', 3, 'CDNX_products_productfinalsean13_foreign'],
+        }
 
     def __groups__(self):
         g = [
@@ -250,6 +253,9 @@ class POSProductFormGroup(GenModelForm):
     class Meta:
         model = POSProduct
         exclude = ['group_product', ]
+        autofill = {
+            'product_final': ['select', 3, 'CDNX_products_productfinalsean13_foreign'],
+        }
 
     def __groups__(self):
         g = [
