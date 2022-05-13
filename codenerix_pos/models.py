@@ -23,11 +23,13 @@ import uuid
 import hashlib
 import random
 import string
-from channels import Channel, Group
+# from channels import Channel, Group
+# from channels import Group
+# from channels.generic.websocket import WebsocketConsumer
 
 from django.db import models
-from django.utils.encoding import smart_text
-from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import smart_str
+from django.utils.translation import gettext_lazy as _
 from django.db.models import Q
 from django.conf import settings
 
@@ -105,7 +107,7 @@ class POSPlant(CodenerixModel):
         return self.__str__()
 
     def __str__(self):
-        return u"{}".format(smart_text(self.name))
+        return u"{}".format(smart_str(self.name))
 
     def __fields__(self, info):
         fields = []
@@ -124,7 +126,7 @@ class POSZone(CodenerixModel):
         return self.__str__()
 
     def __str__(self):
-        return u"{}".format(smart_text(self.name))
+        return u"{}".format(smart_str(self.name))
 
     def __fields__(self, info):
         fields = []
@@ -154,7 +156,7 @@ class POSHardware(CodenerixModel):
         return self.__str__()
 
     def __str__(self):
-        return u"{}: {} ({})".format(smart_text(self.pos.name), smart_text(self.name), smart_text(self.kind))
+        return u"{}: {} ({})".format(smart_str(self.pos.name), smart_str(self.name), smart_str(self.kind))
 
     def __fields__(self, info):
         fields = []
@@ -235,7 +237,7 @@ class POSGroupProduct(CodenerixModel):
         return self.__str__()
 
     def __str__(self):
-        return u"{} ({})".format(smart_text(self.name), smart_text(self.enable))
+        return u"{} ({})".format(smart_str(self.name), smart_str(self.enable))
 
     def __fields__(self, info):
         fields = []
@@ -274,7 +276,7 @@ class POS(CodenerixModel):
         return self.__str__()
 
     def __str__(self):
-        return u"{}".format(smart_text(self.name))
+        return u"{}".format(smart_str(self.name))
 
     def __fields__(self, info):
         fields = []
@@ -353,7 +355,8 @@ class POS(CodenerixModel):
 
         if self.channel:
             data = self.build_msg(data, ref, uid, broadcast, key)
-            Channel(self.channel).send({'text': data})
+            # Channel(self.channel).send({'text': data})
+            WebsocketConsumer(self.channel).send({'text': data})
         else:
             raise IOError("No channel available for this POS")
 
@@ -372,7 +375,7 @@ class POSSlot(CodenerixModel):
         return self.__str__()
 
     def __str__(self):
-        return u"{}".format(smart_text(self.name))
+        return u"{}".format(smart_str(self.name))
 
     def __fields__(self, info):
         fields = []
@@ -397,7 +400,7 @@ class POSProduct(CodenerixModel):
         return self.__str__()
 
     def __str__(self):
-        return u"{} {}".format(smart_text(self.group_product), smart_text(self.product_final))
+        return u"{} {}".format(smart_str(self.group_product), smart_str(self.product_final))
 
     def __fields__(self, info):
         fields = []
@@ -472,7 +475,7 @@ class POSOperator(GenRole, CodenerixModel):
         return get_external_method(POSOperator, POSOperator.CodenerixMeta.force_methods['foreignkey_posoperator'][0])
 
     def __unicode__(self):
-        return u"{}".format(smart_text(self.pk))
+        return u"{}".format(smart_str(self.pk))
 
     def __str__(self):
         return self.__unicode__()
