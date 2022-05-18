@@ -30,25 +30,21 @@ Quickstart
         'codenerix_pos',
     ]
 
-3. Add in settings the params::
-
-4. Since Codenerix Products is a library, you only need to import its parts into your project and use them.
+3. Since Codenerix Products is a library, you only need to import its parts into your project and use them.
 
 *************
 Documentation
 *************
 
-Coming soon... do you help us? `Codenerix <https://www.codenerix.com/>`_
+Coming soon... do you help us?
 
-You can chat with us `here <https://goo.gl/NgpzBh>`_.
+You can get in touch with us `here <https://codenerix.com/contact/>`_.
 
 *******
 Credits
 *******
 
-This project has been possible thanks to `Codenerix <http://www.codenerix.com>`_.
-
-Several technologies have been used to build `CODENERIX <https://www.codenerix.com>`_:
+Several technologies have been used to build CODENERIX POS:
 
 =================================== =================== =========================== =========================================================
 Project name                        License             Owner                       Link to project
