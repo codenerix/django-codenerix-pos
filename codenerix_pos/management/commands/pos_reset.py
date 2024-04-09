@@ -21,7 +21,7 @@
 
 from django.core.management.base import BaseCommand
 
-from codenerix.lib.debugger import Debugger
+from codenerix_lib.debugger import Debugger
 from codenerix_pos.models import POS
 
 
@@ -35,11 +35,13 @@ class Command(BaseCommand, Debugger):
         # Autoconfigure Debugger
         self.set_name("CODENERIX-POS")
         self.set_debug()
-        self.debug("Resetting POS:", color='blue')
+        self.debug("Resetting POS:", color="blue")
 
         # Get all users from the system
         for pos in POS.objects.filter(channel__isnull=False):
-            self.debug("    - {}: {}".format(pos.name, pos.uuid), color='yellow')
+            self.debug(
+                "    - {}: {}".format(pos.name, pos.uuid), color="yellow"
+            )
             pos.reset_client()
             pos.channel = None
             pos.save()

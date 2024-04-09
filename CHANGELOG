@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.4] - 2024-04-09
+### Changed
+- Removed dependency with "codenerix.lib.debugger" in favor of "codenerix_lib.debugger"
+
+## [4.0.3] - 2022-07-14
+### Fixed
+- Repaired broken dependency
+
 ## [4.0.2] - 2022-06-18
 ### Fixed
 - Removed limit on dependencies for this packages

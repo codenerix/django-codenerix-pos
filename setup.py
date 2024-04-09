@@ -41,6 +41,7 @@ setup(
         "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
     ],
     install_requires=[
+        "codenerix-lib",
         "django-codenerix",
         "django-codenerix-payments",
         "django-codenerix-invoicing",
